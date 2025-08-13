@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {ChangeEvent, useState} from "react";
 
 export default function CourseComponent() {
 
@@ -6,27 +6,54 @@ export default function CourseComponent() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
     const [count, setCount] = useState(0);
+    const [course, setCourse] = useState({name: 'Spring Boot', time: 5})
+    const [editingCourse, setEditingCourse] = useState({id: 0, name: "", category: "", instructor: ""});
+    const [deletedCourse, setDeletedCourse] = useState({id: 0, name: "", category: "", instructor: ""});
+
+    // let position = {x:5, y : 6}
 
     const courses = [
         {id: 1, name: "React Basics", category: "Web Development", instructor: "John Doe"},
-        {id: 2, name: "Java Spring Boot", category: "Backend", instructor: "Jane Smith"},
-        {id: 3, name: "Java Spring Boot", category: "Backend", instructor: "Jane Smith"},
-        {id: 4, name: "Java Spring Boot", category: "Backend", instructor: "Jane Smith"},
-        {id: 5, name: "Java Spring Boot", category: "Backend", instructor: "Jane Smith"},
-        {id: 6, name: "Java Spring Boot", category: "Backend", instructor: "Jane Smith"},
-        {id: 7, name: "Java Spring Boot", category: "Backend", instructor: "Jane Smith"},
+        {id: 2, name: "Java Spring Boot1", category: "Backend", instructor: "Jane Smith"},
+        {id: 3, name: "Java Spring Boot2", category: "Backend", instructor: "Jane Smith"},
+        {id: 4, name: "Java Spring Boot3", category: "Backend", instructor: "Jane Smith"},
+        {id: 5, name: "Java Spring Boot4", category: "Backend", instructor: "Jane Smith"},
+        {id: 6, name: "Java Spring Boot5", category: "Backend", instructor: "Jane Smith"},
+        {id: 7, name: "Java Spring Boot6", category: "Backend", instructor: "Jane Smith"},
     ];
+
+    function handleTangThoiLuongHoc() {
+        setCourse({
+            name: course.name,
+            time: course.time +1
+        });
+    }
+
+    function checkTimeValue(event: ChangeEvent<HTMLInputElement>) {
+        const newValue = event.target.value;
+        const numericValue = Number(newValue); // convert sang number
+
+        if (!isNaN(numericValue)) {
+            console.log("New value is correct!");
+        } else {
+            console.log("Please update correct number!");
+        }
+    }
 
     return (
         <div className="bg-white p-6 rounded-lg shadow">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Course Management, số lần Add Course: {count}</h1>
+                <h1 className="text-2xl font-bold">Course Management, số lần Add Course: count from useState: {count}</h1>
+                <h1>Sales off course: {course.name} in {course.time} months with prices: 100$</h1>
+                <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={handleTangThoiLuongHoc}> Tăng thời lượng học</button>
                 <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => {
                     setShowAddModal(true);
-                    setCount(count + 1)
+                    setCount(n => n + 1);
+                    setCount(n => n + 1);
+                    setCount(n => n + 1);
                 }}>
-                    + Add Course
+                    + Add Course Increase Count +3
                 </button>
             </div>
 
@@ -48,7 +75,10 @@ export default function CourseComponent() {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Edit Course</h2>
-                        <h4> Course Name: Spring Boot</h4>
+                        <h4> Course Name: </h4> <input className="h-full w-full border border-green-200" defaultValue={editingCourse.name}/>
+                        <h4> Category: </h4> <input defaultValue={editingCourse.category}/>
+                        <h4> Instructor:</h4> <input defaultValue={editingCourse.instructor}/>
+                        <h4> Time (month):</h4> <input onChange={checkTimeValue} defaultValue={0}/>
                         <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                                 onClick={() => setShowEditModal(false)}>
                             Cancel
@@ -64,7 +94,7 @@ export default function CourseComponent() {
                             <h2 className="text-xl font-bold mb-4 text-red-600">Confirm Delete</h2>
                             <p className="mb-6">
                                 Are you sure you want to delete{" "}
-                                <span className="font-semibold"> Spring Boot</span>?
+                                <span className="font-semibold text-red-600">{deletedCourse.name}</span>?
                                 This action cannot be undone.
                             </p>
                             {/* Actions */}
@@ -105,10 +135,16 @@ export default function CourseComponent() {
                         <td className="p-3">{course.instructor}</td>
                         <td className="p-3 space-x-2">
                             <button className="text-blue-600 hover:underline"
-                                    onClick={() => setShowEditModal(true)}>Edit
+                                    onClick={() => {
+                                        setEditingCourse(course);
+                                        setShowEditModal(true);
+                                    }}>Edit
                             </button>
                             <button
-                                onClick={() => setShowConfirmDeleteModal(true)}
+                                onClick={() => {
+                                    setDeletedCourse(course);
+                                    setShowConfirmDeleteModal(true)
+                                }}
                                 className="text-red-600 hover:underline"
                             >
                                 Delete
