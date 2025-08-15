@@ -13,7 +13,7 @@ export default function Sidebar() {
                         </a>
                     </li>
                     <li>
-                        <a href="#" className="block p-2 rounded hover:bg-gray-700 transition">
+                        <a href="/teacher" className="block p-2 rounded hover:bg-gray-700 transition">
                             Teacher Management
                         </a>
                     </li>
