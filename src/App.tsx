@@ -4,6 +4,7 @@ import Sidebar from "./components/Sidebar";
 import HeaderComponent from "./components/HeaderComponent";
 import CourseComponent from "./components/CoursesComponent";
 import TeacherComponent from "./components/TeacherComponent";
+import StudentComponent from "./components/StudentComponent";
 
 function App() {
     return <>
@@ -15,12 +16,13 @@ function App() {
                     <Routes>
                         <Route path="/course" element={<CourseComponent/>}></Route>
                         <Route path="/teacher" element={<TeacherComponent/>}></Route>
+                        <Route path="/student" element={<StudentComponent/>}></Route>
                     </Routes>
                 </div>
             </div>
 
         </BrowserRouter>
-        </>;
+    </>;
 }
 
 export default App
