@@ -1,4 +1,4 @@
-import {ChangeEvent, useState} from "react";
+import {ChangeEvent, useState, useEffect} from "react";
 
 export default function CourseComponent() {
 
@@ -7,20 +7,19 @@ export default function CourseComponent() {
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
     const [count, setCount] = useState(0);
     const [course, setCourse] = useState({name: 'Spring Boot', time: 5})
-    const [editingCourse, setEditingCourse] = useState({id: 0, name: "", category: "", instructor: ""});
-    const [deletedCourse, setDeletedCourse] = useState({id: 0, name: "", category: "", instructor: ""});
+    const [editingCourse, setEditingCourse] = useState({courseId: 0, description: "Default"});
+    const [deletedCourse, setDeletedCourse] = useState({courseId: 0, description: "Default"});
+    const [courses, setCourses] = useState([{
+        courseId: 1,
+        description: "Default Courses"
+    }]);
 
-    // let position = {x:5, y : 6}
-
-    const courses = [
-        {id: 1, name: "React Basics", category: "Web Development", instructor: "John Doe"},
-        {id: 2, name: "Java Spring Boot1", category: "Backend", instructor: "Jane Smith"},
-        {id: 3, name: "Java Spring Boot2", category: "Backend", instructor: "Jane Smith"},
-        {id: 4, name: "Java Spring Boot3", category: "Backend", instructor: "Jane Smith"},
-        {id: 5, name: "Java Spring Boot4", category: "Backend", instructor: "Jane Smith"},
-        {id: 6, name: "Java Spring Boot5", category: "Backend", instructor: "Jane Smith"},
-        {id: 7, name: "Java Spring Boot6", category: "Backend", instructor: "Jane Smith"},
-    ];
+    useEffect(() => {
+        fetch("http://localhost:8080/courses/all")
+            .then(response => response.json())
+            .then(data => setCourses(data))
+            .catch(error => console.error("Error:", error));
+    }, []);
 
     function handleTangThoiLuongHoc() {
         setCourse({
@@ -75,9 +74,7 @@ export default function CourseComponent() {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Edit Course</h2>
-                        <h4> Course Name: </h4> <input className="h-full w-full border border-green-200" defaultValue={editingCourse.name}/>
-                        <h4> Category: </h4> <input defaultValue={editingCourse.category}/>
-                        <h4> Instructor:</h4> <input defaultValue={editingCourse.instructor}/>
+                        <h4> Course Name: </h4> <input className="h-full w-full border border-green-200" defaultValue={editingCourse.description}/>
                         <h4> Time (month):</h4> <input onChange={checkTimeValue} defaultValue={0}/>
                         <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                                 onClick={() => setShowEditModal(false)}>
@@ -94,7 +91,7 @@ export default function CourseComponent() {
                             <h2 className="text-xl font-bold mb-4 text-red-600">Confirm Delete</h2>
                             <p className="mb-6">
                                 Are you sure you want to delete{" "}
-                                <span className="font-semibold text-red-600">{deletedCourse.name}</span>?
+                                <span className="font-semibold text-red-600">{deletedCourse.description}</span>?
                                 This action cannot be undone.
                             </p>
                             {/* Actions */}
@@ -122,17 +119,13 @@ export default function CourseComponent() {
                 <thead>
                 <tr className="bg-gray-200">
                     <th className="p-3 text-left">Course Name</th>
-                    <th className="p-3 text-left">Category</th>
-                    <th className="p-3 text-left">Instructor</th>
                     <th className="p-3 text-left">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {courses.map((course) => (
-                    <tr key={course.id} className="border-b hover:bg-gray-50">
-                        <td className="p-3">{course.name}</td>
-                        <td className="p-3">{course.category}</td>
-                        <td className="p-3">{course.instructor}</td>
+                    <tr key={course.courseId} className="border-b hover:bg-gray-50">
+                        <td className="p-3">{course.description}</td>
                         <td className="p-3 space-x-2">
                             <button className="text-blue-600 hover:underline"
                                     onClick={() => {
