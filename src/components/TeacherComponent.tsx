@@ -1,19 +1,21 @@
 import TeacherAvatar from '../assets/TeacherAvatar.jpg';
 import MaleTeacher from '../assets/MaleTeacher.jpg';
 
+import React, { useEffect, useState } from 'react';
+
 export default function TeacherComponent() {
-    let teachers = [
-        {id: 1, name: "Nguyen Van A", subject: "Mathematics"},
-        {id: 2, name: "Nguyen Van B", subject: "Physics"},
-        {id: 3, name: "Nguyen Van B3", subject: "Physics"},
-        {id: 4, name: "Nguyen Van B4", subject: "Physics"},
-        {id: 5, name: "Nguyen Van B5", subject: "Physics"},
-        {id: 6, name: "Nguyen Van B6", subject: "Physics"},
-        {id: 7, name: "Nguyen Van B7", subject: "Physics"},
-        {id: 8, name: "Nguyen Van B8", subject: "Physics"},
-        {id: 9, name: "Nguyen Van B9", subject: "Physics"},
-        {id: 10, name: "Nguyen Van B10", subject: "Physics"},
-    ]
+
+	const [teachers, setTeachers] = useState([{
+		teacherName: "Nguyen Van A",
+		subject: "Java"
+	}]);
+
+	useEffect(() => {
+		fetch("http://localhost:8080/teachers/all")
+			.then(response => response.json())
+			.then(data => setTeachers(data))
+			.catch(error => console.error("Error:", error));
+	}, []);
 
     const TeacherCard = ({imageUrl = TeacherAvatar, name, subject}) => {
         return (
