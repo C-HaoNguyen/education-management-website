@@ -5,7 +5,6 @@ export default function CourseComponent() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
-    const [count, setCount] = useState(0);
     const [course, setCourse] = useState({name: 'Spring Boot', time: 5})
     const [editingCourse, setEditingCourse] = useState({courseId: 0, description: "Default"});
     const [deletedCourse, setDeletedCourse] = useState({courseId: 0, description: "Default"});
@@ -13,6 +12,8 @@ export default function CourseComponent() {
         courseId: 1,
         description: "Default Courses"
     }]);
+    const [newCourseName, setNewCourseName] = useState("");
+
 
     useEffect(() => {
         fetch("http://localhost:8080/courses/all")
@@ -20,13 +21,6 @@ export default function CourseComponent() {
             .then(data => setCourses(data))
             .catch(error => console.error("Error:", error));
     }, []);
-
-    function handleTangThoiLuongHoc() {
-        setCourse({
-            name: course.name,
-            time: course.time +1
-        });
-    }
 
     function checkTimeValue(event: ChangeEvent<HTMLInputElement>) {
         const newValue = event.target.value;
@@ -39,20 +33,35 @@ export default function CourseComponent() {
         }
     }
 
+    function handleSaveNewCourse() {
+        console.log('Handle save');
+        const formData = new URLSearchParams();
+        formData.append("courseDescription", newCourseName);
+        fetch('http://localhost:8080/courses/add', {
+            method: 'POST',
+            headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData.toString(),
+          })
+          .then(() => {
+            // fetch updated list
+            return fetch("http://localhost:8080/courses/all")
+                .then(res => res.json())
+                .then(data => setCourses(data));
+        });
+        setShowAddModal(false);
+    }
+
     return (
         <div className="bg-white p-6 rounded-lg shadow">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Course Management, số lần Add Course: count from useState: {count}</h1>
-                <h1>Sales off course: {course.name} in {course.time} months with prices: 100$</h1>
-                <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={handleTangThoiLuongHoc}> Tăng thời lượng học</button>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => {
+                <h1 className="text-2xl font-bold">Course Management</h1>
+                <button className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={() => {
                     setShowAddModal(true);
-                    setCount(n => n + 1);
-                    setCount(n => n + 1);
-                    setCount(n => n + 1);
                 }}>
-                    + Add Course Increase Count +3
+                    + Add Course
                 </button>
             </div>
 
@@ -61,7 +70,11 @@ export default function CourseComponent() {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Add New Course</h2>
-                        <h4> Course Name: Please enter course name</h4>
+                        <h4> Course Name:</h4> <input className="h-full w-full border border-green-200" value={newCourseName} onChange= {(e) => setNewCourseName(e.target.value)}/>
+                        <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                                onClick={handleSaveNewCourse}>
+                            Save
+                        </button>
                         <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                                 onClick={() => setShowAddModal(false)}>
                             Cancel
@@ -70,7 +83,7 @@ export default function CourseComponent() {
                 </div> : <></>
             }
 
-            {showEditModal ?
+            {showEditModal &&
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Edit Course</h2>
@@ -81,11 +94,11 @@ export default function CourseComponent() {
                             Cancel
                         </button>
                     </div>
-                </div> : <></>
+                </div>
             }
 
             {
-                showConfirmDeleteModal ?
+                showConfirmDeleteModal &&
                     <div className="fixed inset-0 flex items-center justify-center z-50">
                         <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                             <h2 className="text-xl font-bold mb-4 text-red-600">Confirm Delete</h2>
@@ -110,7 +123,7 @@ export default function CourseComponent() {
                                 </button>
                             </div>
                         </div>
-                    </div> : <></>
+                    </div>
             }
 
 
