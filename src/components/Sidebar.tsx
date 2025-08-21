@@ -5,7 +5,7 @@ export default function Sidebar() {
         <div className="h-screen w-64 bg-gray-800 text-white flex flex-col">
 
             {/* Menu */}
-            <nav className="flex-1 p-4">
+            <nav className="flex-1 p-2">
                 <ul className="space-y-2">
                     <li>
                         <a href="/course" className="block p-2 rounded hover:bg-gray-700 transition">
@@ -13,12 +13,12 @@ export default function Sidebar() {
                         </a>
                     </li>
                     <li>
-                        <a href="#" className="block p-2 rounded hover:bg-gray-700 transition">
+                        <a href="/teacher" className="block p-2 rounded hover:bg-gray-700 transition">
                             Teacher Management
                         </a>
                     </li>
                     <li>
-                        <a href="#" className="block p-2 rounded hover:bg-gray-700 transition">
+                        <a href="/student" className="block p-2 rounded hover:bg-gray-700 transition">
                             Student Management
                         </a>
                     </li>
