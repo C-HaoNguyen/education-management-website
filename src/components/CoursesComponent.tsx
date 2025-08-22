@@ -1,4 +1,4 @@
-import {ChangeEvent, useState, useEffect} from "react";
+import {ChangeEvent, useState, useEffect, ChangeEventHandler} from "react";
 
 export default function CourseComponent() {
 
@@ -18,7 +18,12 @@ export default function CourseComponent() {
     useEffect(() => {
         fetch("http://localhost:8080/courses/all")
             .then(response => response.json())
-            .then(data => setCourses(data))
+            .then(data => {
+                const sortedCourses = [...data].sort((a, b) =>
+                    a.description.localeCompare(b.description)
+                  );
+                setCourses(sortedCourses)
+            })
             .catch(error => console.error("Error:", error));
     }, []);
 
@@ -34,25 +39,102 @@ export default function CourseComponent() {
     }
 
     function handleSaveNewCourse() {
-        console.log('Handle save');
+        if (newCourseName == '') {
+            alert("Vui lòng nhập tên khóa học!");
+            return;
+        }
         const formData = new URLSearchParams();
         formData.append("courseDescription", newCourseName);
-        fetch('http://localhost:8080/courses/add', {
+        const response = fetch('http://localhost:8080/courses/add', {
             method: 'POST',
             headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             },
             body: formData.toString(),
-          })
-          .then(() => {
+          });
+
+          response.then(() => {
             // fetch updated list
-            return fetch("http://localhost:8080/courses/all")
+            fetch("http://localhost:8080/courses/all", {
+                method: 'GET',
+            })
                 .then(res => res.json())
-                .then(data => setCourses(data));
+                .then(data => {
+                    const sortedCourses = [...data].sort((a, b) =>
+                        a.description.localeCompare(b.description)
+                      );
+                    setCourses(sortedCourses)
+                });
         });
+        setNewCourseName('');
         setShowAddModal(false);
     }
 
+    function handleCancelAddCourse() {
+        setNewCourseName('');
+        setShowAddModal(false);
+    }
+
+    function handleEditCourseName(e: ChangeEvent<HTMLInputElement>) {
+        //Java Basic 2343254325
+        const newUpdatingCourseName = e.target.value;
+        editingCourse.description = newUpdatingCourseName;
+    }
+
+    function handleEditCourse() {
+        const formData = new URLSearchParams();
+        formData.append("id", editingCourse.courseId.toString());
+        formData.append("courseDescription", editingCourse.description);
+        const response = fetch('http://localhost:8080/courses/update', {
+            method: 'PUT',
+            headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData.toString(),
+          });
+
+          response.then(() => {
+            // fetch updated list
+            fetch("http://localhost:8080/courses/all", {
+                method: 'GET',
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const sortedCourses = [...data].sort((a, b) =>
+                        a.description.localeCompare(b.description)
+                      );
+                    setCourses(sortedCourses)
+                });
+        });  
+        setShowEditModal(false);
+    }
+
+    function handleDeleteCourse() {
+        const formData = new URLSearchParams();
+        formData.append("id", deletedCourse.courseId.toString());
+        const response = fetch('http://localhost:8080/courses/delete', {
+            method: 'DELETE',
+            headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData.toString(),
+          });
+
+          response.then(() => {
+            // fetch updated list
+            fetch("http://localhost:8080/courses/all", {
+                method: 'GET',
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const sortedCourses = [...data].sort((a, b) =>
+                        a.description.localeCompare(b.description)
+                      );
+                    setCourses(sortedCourses)
+                });
+        });  
+        setShowConfirmDeleteModal(false);
+    }
     return (
         <div className="bg-white p-6 rounded-lg shadow">
             {/* Header */}
@@ -71,14 +153,16 @@ export default function CourseComponent() {
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Add New Course</h2>
                         <h4> Course Name:</h4> <input className="h-full w-full border border-green-200" value={newCourseName} onChange= {(e) => setNewCourseName(e.target.value)}/>
-                        <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                                onClick={handleSaveNewCourse}>
-                            Save
-                        </button>
-                        <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                                onClick={() => setShowAddModal(false)}>
-                            Cancel
-                        </button>
+                        <div className="pt-2">
+                            <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700  mr-2"
+                                    onClick={handleSaveNewCourse}>
+                                Save
+                            </button>
+                            <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                    onClick={handleCancelAddCourse}>
+                                Cancel
+                            </button>
+                        </div>    
                     </div>
                 </div> : <></>
             }
@@ -87,8 +171,12 @@ export default function CourseComponent() {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Edit Course</h2>
-                        <h4> Course Name: </h4> <input className="h-full w-full border border-green-200" defaultValue={editingCourse.description}/>
-                        <h4> Time (month):</h4> <input onChange={checkTimeValue} defaultValue={0}/>
+                        <h4> Course Name: </h4>
+                        <input className="h-full w-full border border-green-200" defaultValue={editingCourse.description} onChange= {handleEditCourseName}/>
+                        <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700  mr-2"
+                                    onClick={handleEditCourse}>
+                                Save
+                            </button>
                         <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                                 onClick={() => setShowEditModal(false)}>
                             Cancel
@@ -116,7 +204,7 @@ export default function CourseComponent() {
                                     Cancel
                                 </button>
                                 <button
-                                    onClick={() => setShowConfirmDeleteModal(false)}
+                                    onClick={handleDeleteCourse}
                                     className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
                                 >
                                     Delete
