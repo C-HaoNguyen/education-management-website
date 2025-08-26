@@ -8,6 +8,7 @@ export default function TeacherComponent() {
 	const [newTeacherName, setNewTeacherName] = useState("");
 	const [newTeacherEmail, setNewTeacherEmail] = useState("");
 	const [newTeacherPhoneNumber, setNewTeacherPhoneNumber] = useState("");
+	const [hasError, setHasError] = useState(false);
 
 	const [teachers, setTeachers] = useState([{
 		teacherId: 1,
@@ -17,19 +18,14 @@ export default function TeacherComponent() {
 	}]);
 
 	useEffect(() => {
-		fetch("http://localhost:8080/teachers/all")
-			.then(response => response.json())
-			.then(data => setTeachers(data))
-			.catch(error => console.error("Error:", error));
+		refreshTeacherList();
 	}, []);
 
 	function handleSaveNewTeacher() {
-		const newTeacher = {
-			teacherName: newTeacherName,
-			email: newTeacherEmail,
-			phoneNumber: newTeacherPhoneNumber
-		};
-
+		if (newTeacherName == '' || newTeacherEmail == '' || newTeacherPhoneNumber == '') {
+			setHasError(true);
+			return;
+		}
 		const formData = new URLSearchParams();
 		formData.append("teacherName", newTeacherName);
 		formData.append("email", newTeacherEmail);
@@ -43,20 +39,12 @@ export default function TeacherComponent() {
 			body: formData.toString(),
 		});
 		response.then(() => {
-			fetch("http://localhost:8080/teachers/all", {
-				method: 'GET',
-			})
-				.then(res => res.json())
-				.then(data => {
-					const sortedTeachers = [...data].sort((a, b) =>
-						a.teacherName.localeCompare(b.teacherName)
-					);
-					setTeachers(sortedTeachers);
-				});
+			refreshTeacherList();
 			setShowAddModal(false);
 			setNewTeacherName("");
 			setNewTeacherEmail("");
 			setNewTeacherPhoneNumber("");
+			setHasError(false);
 		})
 			.catch(error => console.error("Error:", error));
 	}
@@ -64,6 +52,24 @@ export default function TeacherComponent() {
 	function handleCancelAddTeacher() {
 		setShowAddModal(false);
 		setNewTeacherName("");
+		setHasError(false);
+	}
+
+	function handleOnUpdatedTeacher() {
+		refreshTeacherList();
+	}
+
+	function refreshTeacherList() {
+		fetch("http://localhost:8080/teachers/all", {
+			method: 'GET',
+		})
+			.then(res => res.json())
+			.then(data => {
+				const sortedTeachers = [...data].sort((a, b) =>
+					a.teacherName.localeCompare(b.teacherName)
+				);
+				setTeachers(sortedTeachers);
+			});
 	}
 
 	return (
@@ -80,6 +86,7 @@ export default function TeacherComponent() {
 				<div className="fixed inset-0 flex items-center justify-center z-50">
 					<div className="bg-white rounded-lg shadow-lg w-96 p-6">
 						<h2 className="text-xl font-bold mb-4">Add New Teacher</h2>
+						{hasError ? <h3 className='text-red-500'>Please enter all field before save modal!</h3> : <></>}
 						<h4> Teacher Name:</h4> <input className="h-full w-full border border-green-200" value={newTeacherName} onChange={(e) => setNewTeacherName(e.target.value)} />
 						<h4> Email:</h4> <input className="h-full w-full border border-green-200" value={newTeacherEmail} onChange={(e) => setNewTeacherEmail(e.target.value)} />
 						<h4> Phone Number:</h4> <input className="h-full w-full border border-green-200" value={newTeacherPhoneNumber} onChange={(e) => setNewTeacherPhoneNumber(e.target.value)} />
@@ -99,7 +106,8 @@ export default function TeacherComponent() {
 
 			<div className="grid grid-cols-5 gap-4">
 				{teachers.map((teacher) => (
-					<TeacherCard teacherId={teacher.teacherId} name={teacher.teacherName} email={teacher.email} phoneNumber={teacher.phoneNumber} />
+					<TeacherCard key={teacher.teacherId} teacherId={teacher.teacherId} name={teacher.teacherName} email={teacher.email} phoneNumber={teacher.phoneNumber} 
+					onUpdatedTeacher={handleOnUpdatedTeacher}/>
 				))}
 			</div>
 		</div>

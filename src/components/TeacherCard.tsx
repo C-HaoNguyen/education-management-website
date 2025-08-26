@@ -6,9 +6,10 @@ type TeacherCardProps = {
     name: string;
     email: string;
     phoneNumber: string;
+    onUpdatedTeacher: () => void
 };
 
-export default function TeacherCard({teacherId, name, email, phoneNumber }: TeacherCardProps) {
+export default function TeacherCard({teacherId, name, email, phoneNumber, onUpdatedTeacher}: TeacherCardProps) {
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
@@ -17,11 +18,24 @@ export default function TeacherCard({teacherId, name, email, phoneNumber }: Teac
     const [editedTeacherPhoneNumber, setEditedTeacherPhoneNumber] = useState(phoneNumber);
 
     function handleDeleteTeacher() {
-        
+        //call api to delete this teacher
+        const formData = new URLSearchParams();
+        formData.append("id", teacherId.toString());
+        const response = fetch('http://localhost:8080/teachers/delete', {
+            method: 'DELETE',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData.toString(),
+        });
+
+        response.then(() => {
+			setShowConfirmDeleteModal(false);
+            onUpdatedTeacher();
+		})
     }
 
     function handleEditTeacher() {
-
 		const formData = new URLSearchParams();
 		formData.append("teacherId", teacherId.toString());
 		formData.append("teacherName", editedTeacherName);
@@ -38,12 +52,13 @@ export default function TeacherCard({teacherId, name, email, phoneNumber }: Teac
 
 		response.then(() => {
 			setShowEditModal(false);
+            onUpdatedTeacher();
 		})
 			.catch(error => console.error("Error:", error));
     }
 
     return (
-        <div className="w-50 h-50">
+        <div className="w-70 h-70">
             {showEditModal &&
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
@@ -95,7 +110,7 @@ export default function TeacherCard({teacherId, name, email, phoneNumber }: Teac
                 </div>
             }
             {/* Khối màu nền cho ảnh */}
-            <div className="bg-gray-400">
+            <div>
                 <img
                     src={TeacherAvatar}
                     alt={`Ảnh của ${name}`}
