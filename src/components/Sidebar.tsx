@@ -23,7 +23,7 @@ export default function Sidebar() {
                         </a>
                     </li>
                     <li>
-                        <a href="#" className="block p-2 rounded hover:bg-gray-700 transition">
+                        <a href="/classes" className="block p-2 rounded hover:bg-gray-700 transition">
                             Class Management
                         </a>
                     </li>

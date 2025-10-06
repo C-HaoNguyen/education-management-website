@@ -5,6 +5,7 @@ import HeaderComponent from "./components/HeaderComponent";
 import CourseComponent from "./components/CoursesComponent";
 import TeacherComponent from "./components/TeacherComponent";
 import StudentComponent from "./components/StudentComponent";
+import ClassesComponent from './components/ClassesComponent';
 
 function App() {
     return <>
@@ -17,6 +18,7 @@ function App() {
                         <Route path="/course" element={<CourseComponent/>}></Route>
                         <Route path="/teacher" element={<TeacherComponent/>}></Route>
                         <Route path="/student" element={<StudentComponent/>}></Route>
+                        <Route path="/classes" element={<ClassesComponent/>}></Route>
                     </Routes>
                 </div>
             </div>
