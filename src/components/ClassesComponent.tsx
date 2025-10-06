@@ -12,7 +12,9 @@ export default function ClassesComponent() {
         classId: 0,
         className: "",
         teacherId: "",
+        teacherName:"",
         courseId: "",
+        courseName:"",
         startDate: ""
     }]);
 
@@ -21,7 +23,7 @@ export default function ClassesComponent() {
     }, []);
 
     function refreshClassList() {
-        fetch("http://localhost:8080/classes/all", {
+        fetch("http://localhost:8080/classes/allDetail", {
             method: 'GET',
         })
             .then(res => res.json())
@@ -59,8 +61,8 @@ export default function ClassesComponent() {
                 <thead>
                     <tr>
                         <th className="border border-gray-400 px-4 py-2">Class name</th>
-                        <th className="border border-gray-400 px-4 py-2">Teacher Id</th>
-                        <th className="border border-gray-400 px-4 py-2">CourseName</th>
+                        <th className="border border-gray-400 px-4 py-2">Teacher Name</th>
+                        <th className="border border-gray-400 px-4 py-2">Course Name</th>
                         <th className="border border-gray-400 px-4 py-2">Start Date</th>
                         <th className="border border-gray-400 px-4 py-2">Actions</th>
                     </tr>
@@ -69,8 +71,8 @@ export default function ClassesComponent() {
                     {classes.map((lop) => (
                         <tr>
                             <td className="border border-gray-400 px-4 py-2">{lop.className}</td>
-                            <td className="border border-gray-400 px-4 py-2">{lop.teacherId}</td>
-                            <td className="border border-gray-400 px-4 py-2">{lop.courseId}</td>
+                            <td className="border border-gray-400 px-4 py-2">{lop.teacherName}</td>
+                            <td className="border border-gray-400 px-4 py-2">{lop.courseName}</td>
                             <td className="border border-gray-400 px-4 py-2">{lop.startDate}</td>
                             <td className="border border-gray-400 px-4 py-2">
                                 <button className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2" onClick={() => {
