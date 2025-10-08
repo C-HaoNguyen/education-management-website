@@ -1,5 +1,5 @@
 import { Edit, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
 
 export default function ClassesComponent() {
     const [isShowConfirmDeleteModal, setIsShowConfirmDeleteModal] = useState(false);
@@ -17,9 +17,28 @@ export default function ClassesComponent() {
         courseName:"",
         startDate: ""
     }]);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingClass, setEditingClass] = useState<any>(null);
+    const [teachers, setTeachers] = useState([{
+		teacherId: 1,
+		teacherName: 'Nguyen Van A',
+		email: 'a@gmail.com',
+		phoneNumber: '012321421'
+	}]);
+
 
     useEffect(() => {
         refreshClassList();
+        fetch("http://localhost:8080/teachers/all", {
+			method: 'GET',
+		})
+			.then(res => res.json())
+			.then(data => {
+				const sortedTeachers = [...data].sort((a, b) =>
+					a.teacherName.localeCompare(b.teacherName)
+				);
+				setTeachers(sortedTeachers);
+			});
     }, []);
 
     function refreshClassList() {
@@ -53,6 +72,36 @@ export default function ClassesComponent() {
         setIsShowConfirmDeleteModal(false);
     }
 
+    function handleUpdateClass() {
+        const formData = new URLSearchParams();
+        formData.append("classId", editingClass.classId.toString());
+        formData.append("className", editingClass.className);
+        formData.append("teacherId", editingClass.teacherId);
+        formData.append("courseId", editingClass.courseId);
+        formData.append("startDate", editingClass.startDate);
+        const response = fetch('http://localhost:8080/classes/update', {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData.toString(),
+        });
+
+        response.then(() => {
+            // fetch updated list
+            refreshClassList();
+        });
+        setShowEditModal(false);
+    }
+
+    function handleCancelEditClass() {
+        setShowEditModal(false);
+    }
+
+    function handleChangeTeacher(event: ChangeEvent<HTMLSelectElement>) {
+       setEditingClass({ ...editingClass, teacherId: event.target.value });
+    };
+
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4">Class Management</h1>
@@ -76,8 +125,8 @@ export default function ClassesComponent() {
                             <td className="border border-gray-400 px-4 py-2">{lop.startDate}</td>
                             <td className="border border-gray-400 px-4 py-2">
                                 <button className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2" onClick={() => {
-                                    // setEditingStudent(student);
-                                    // setShowEditModal(true);
+                                    setEditingClass(lop);
+                                    setShowEditModal(true);
                                 }}>
                                     <Edit size={18} />
                                 </button>
@@ -93,6 +142,36 @@ export default function ClassesComponent() {
                     ))}
                 </tbody>
             </table>
+
+            {showEditModal ?
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg w-96 p-6">
+                        <h2 className="text-xl font-bold mb-4">Edit Class</h2>
+                        <h4> Class Name </h4> <input className="h-full w-full border border-green-200" value={editingClass.className} onChange={(e) => setEditingClass({ ...editingClass, className: e.target.value })} />
+                        <h4> Teacher </h4>
+                        <select
+                            id="teacher"
+                            value={editingClass.teacherId}
+                            onChange={handleChangeTeacher}
+                            className="border rounded p-2">
+                            {teachers.map((giaovien) => (
+                                <option value={giaovien.teacherId}>{giaovien.teacherName}</option>))
+                            }
+                        </select>
+                        <h4> Start Date </h4> <input type="date" className="h-full w-full border border-green-200" value={editingClass.startDate} onChange={(e) => setEditingClass({ ...editingClass, startDate: e.target.value })} />
+                        <div className="pt-2">
+                            <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700  mr-2"
+                                onClick={handleUpdateClass}>
+                                Save
+                            </button>
+                            <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                onClick={handleCancelEditClass}>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div> : <></>
+            }
 
             {
                 isShowConfirmDeleteModal &&
