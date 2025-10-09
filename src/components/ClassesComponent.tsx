@@ -12,34 +12,54 @@ export default function ClassesComponent() {
         classId: 0,
         className: "",
         teacherId: "",
-        teacherName:"",
+        teacherName: "",
         courseId: "",
-        courseName:"",
+        courseName: "",
         startDate: ""
     }]);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newClass, setNewClass] = useState({
+        classId: 0,
+        className: "",
+        teacherId: "",
+        teacherName: "",
+        courseId: "",
+        courseName: "",
+        startDate: ""
+    });
+
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingClass, setEditingClass] = useState<any>(null);
     const [teachers, setTeachers] = useState([{
-		teacherId: 1,
-		teacherName: 'Nguyen Van A',
-		email: 'a@gmail.com',
-		phoneNumber: '012321421'
-	}]);
-
+        teacherId: 1,
+        teacherName: 'Nguyen Van A',
+        email: 'a@gmail.com',
+        phoneNumber: '012321421'
+    }]);
+    const [courses, setCourses] = useState([{
+        courseId: 1,
+        description: 'Toan',
+    }]);
+    const [isShowErrorMessage, setIsShowErrorMessage] = useState(false);
 
     useEffect(() => {
         refreshClassList();
-        fetch("http://localhost:8080/teachers/all", {
-			method: 'GET',
-		})
-			.then(res => res.json())
-			.then(data => {
-				const sortedTeachers = [...data].sort((a, b) =>
-					a.teacherName.localeCompare(b.teacherName)
-				);
-				setTeachers(sortedTeachers);
-			});
+        refreshTeacherList();
+        refreshCourseList();
     }, []);
+
+    function refreshTeacherList() {
+        fetch("http://localhost:8080/teachers/all", {
+            method: 'GET',
+        })
+            .then(res => res.json())
+            .then(data => {
+                const sortedTeachers = [...data].sort((a, b) =>
+                    a.teacherName.localeCompare(b.teacherName)
+                );
+                setTeachers(sortedTeachers);
+            });
+    }
 
     function refreshClassList() {
         fetch("http://localhost:8080/classes/allDetail", {
@@ -51,6 +71,19 @@ export default function ClassesComponent() {
                     a.className.localeCompare(b.className)
                 );
                 setClasses(sortedClasses);
+            });
+    }
+
+    function refreshCourseList() {
+        fetch("http://localhost:8080/courses/all", {
+            method: 'GET',
+        })
+            .then(res => res.json())
+            .then(data => {
+                const sortedCourses = [...data].sort((a, b) =>
+                    a.description.localeCompare(b.description)
+                );
+                setCourses(sortedCourses);
             });
     }
 
@@ -72,7 +105,42 @@ export default function ClassesComponent() {
         setIsShowConfirmDeleteModal(false);
     }
 
+    function handleSaveClass() {
+        if (!newClass.className || newClass.className.trim() === "") {
+            setIsShowErrorMessage(true);
+            return;
+        }
+        const formData = new URLSearchParams();
+        formData.append("className", newClass.className);
+        formData.append("teacherId", newClass.teacherId);
+        formData.append("courseId", newClass.courseId);
+        formData.append("startDate", newClass.startDate);
+        const response = fetch('http://localhost:8080/classes/add', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData.toString(),
+        });
+
+        response.then(() => {
+            // fetch updated list
+            refreshClassList();
+        });
+        setShowAddModal(false);
+        setIsShowErrorMessage(false);
+    }
+
+    function handleCancelSaveClass() {
+        setShowAddModal(false);
+        setIsShowErrorMessage(false);
+    }
+
     function handleUpdateClass() {
+        if (!editingClass.className || editingClass.className.trim() === "") {
+            setIsShowErrorMessage(true);
+            return;
+        }
         const formData = new URLSearchParams();
         formData.append("classId", editingClass.classId.toString());
         formData.append("className", editingClass.className);
@@ -92,20 +160,38 @@ export default function ClassesComponent() {
             refreshClassList();
         });
         setShowEditModal(false);
+        setIsShowErrorMessage(false);
     }
 
     function handleCancelEditClass() {
         setShowEditModal(false);
+        setIsShowErrorMessage(false);
+    }
+
+    function handleAddNewTeacher(event: ChangeEvent<HTMLSelectElement>) {
+        setNewClass({ ...newClass, teacherId: event.target.value });
+    };
+
+    function handleChangeCourseForNewClass(event: ChangeEvent<HTMLSelectElement>) {
+        setNewClass({ ...newClass, courseId: event.target.value });
     }
 
     function handleChangeTeacher(event: ChangeEvent<HTMLSelectElement>) {
-       setEditingClass({ ...editingClass, teacherId: event.target.value });
+        setEditingClass({ ...editingClass, teacherId: event.target.value });
     };
+
+    function handleChangeCourse(event: ChangeEvent<HTMLSelectElement>) {
+        setEditingClass({ ...editingClass, courseId: event.target.value });
+    }
 
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4">Class Management</h1>
-
+            <button className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={() => {
+                setShowAddModal(true);
+            }}>
+                + Add New Class
+            </button>
             <table className="border-collapse border border-gray-400 w-full">
                 <thead>
                     <tr>
@@ -143,10 +229,52 @@ export default function ClassesComponent() {
                 </tbody>
             </table>
 
+            {showAddModal ?
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg w-96 p-6">
+                        <h2 className="text-xl font-bold mb-4">Add new class</h2>
+                        {isShowErrorMessage ? <h5 className="text-red-500">Please enter class name</h5> : <></>}
+                        <h4> Class Name </h4> <input className="h-full w-full border border-green-200" value={newClass.className} onChange={(e) => setNewClass({ ...newClass, className: e.target.value })} />
+                        <h4> Teacher </h4>
+                        <select
+                            id="teacher"
+                            value={newClass.teacherId}
+                            onChange={handleAddNewTeacher}
+                            className="border rounded p-2">
+                            {teachers.map((giaovien) => (
+                                <option value={giaovien.teacherId}>{giaovien.teacherName}</option>))
+                            }
+                        </select>
+                        <h4> Course Name </h4>
+                        <select
+                            id="course"
+                            value={newClass.courseId}
+                            onChange={handleChangeCourseForNewClass}
+                            className="border rounded p-2">
+                            {courses.map((course) => (
+                                <option value={course.courseId}>{course.description}</option>))
+                            }
+                        </select>
+                        <h4> Start Date </h4> <input type="date" className="h-full w-full border border-green-200" value={newClass.startDate} onChange={(e) => setNewClass({ ...newClass, startDate: e.target.value })} />
+                        <div className="pt-2">
+                            <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700  mr-2"
+                                onClick={handleSaveClass}>
+                                Save
+                            </button>
+                            <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                onClick={handleCancelSaveClass}>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div> : <></>
+            }
+
             {showEditModal ?
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Edit Class</h2>
+                        {isShowErrorMessage ? <h5 className="text-red-500">Please enter class name</h5> : <></>}
                         <h4> Class Name </h4> <input className="h-full w-full border border-green-200" value={editingClass.className} onChange={(e) => setEditingClass({ ...editingClass, className: e.target.value })} />
                         <h4> Teacher </h4>
                         <select
@@ -156,6 +284,16 @@ export default function ClassesComponent() {
                             className="border rounded p-2">
                             {teachers.map((giaovien) => (
                                 <option value={giaovien.teacherId}>{giaovien.teacherName}</option>))
+                            }
+                        </select>
+                        <h4> Course Name </h4>
+                        <select
+                            id="course"
+                            value={editingClass.courseId}
+                            onChange={handleChangeCourse}
+                            className="border rounded p-2">
+                            {courses.map((course) => (
+                                <option value={course.courseId}>{course.description}</option>))
                             }
                         </select>
                         <h4> Start Date </h4> <input type="date" className="h-full w-full border border-green-200" value={editingClass.startDate} onChange={(e) => setEditingClass({ ...editingClass, startDate: e.target.value })} />
