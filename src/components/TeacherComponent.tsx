@@ -9,6 +9,7 @@ export default function TeacherComponent() {
 	const [newTeacherEmail, setNewTeacherEmail] = useState("");
 	const [newTeacherPhoneNumber, setNewTeacherPhoneNumber] = useState("");
 	const [hasError, setHasError] = useState(false);
+	const [filterValue, setFilterValue] = useState("");
 
 	const [teachers, setTeachers] = useState([{
 		teacherId: 1,
@@ -19,7 +20,7 @@ export default function TeacherComponent() {
 
 	useEffect(() => {
 		refreshTeacherList();
-	}, []);
+	}, [filterValue]);
 
 	function handleSaveNewTeacher() {
 		if (newTeacherName == '' || newTeacherEmail == '' || newTeacherPhoneNumber == '') {
@@ -68,14 +69,46 @@ export default function TeacherComponent() {
 				const sortedTeachers = [...data].sort((a, b) =>
 					a.teacherName.localeCompare(b.teacherName)
 				);
-				setTeachers(sortedTeachers);
+				// filter part
+				if (filterValue === "") {
+					setTeachers(sortedTeachers);
+				} else {
+					const filteredTeachers = sortedTeachers.filter(value => value.teacherName.includes(filterValue));
+					setTeachers(filteredTeachers);
+				}
 			});
 	}
+
 
 	return (
 		<div className="bg-white h-full p-6 rounded-lg shadow">
 			<div className="flex justify-between items-center mb-4">
 				<h2 className="text-2xl font-bold text-gray-800">Teachers</h2>
+				{/* Thanh tìm kiếm (optional) */}
+				<div className="hidden md:block">
+					<div className="relative w-128">
+						<input
+							type="text"
+							placeholder="Search..."
+							className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
+							onChange={(e) => setFilterValue(e.target.value)}
+						/>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"
+							/>
+						</svg>
+					</div>
+				</div>
 				<button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
 					onClick={() => setShowAddModal(true)}>
 					Add Teacher
@@ -106,8 +139,8 @@ export default function TeacherComponent() {
 
 			<div className="grid grid-cols-5 gap-4">
 				{teachers.map((teacher) => (
-					<TeacherCard key={teacher.teacherId} teacherId={teacher.teacherId} name={teacher.teacherName} email={teacher.email} phoneNumber={teacher.phoneNumber} 
-					onUpdatedTeacher={handleOnUpdatedTeacher}/>
+					<TeacherCard key={teacher.teacherId} teacherId={teacher.teacherId} name={teacher.teacherName} email={teacher.email} phoneNumber={teacher.phoneNumber}
+						onUpdatedTeacher={handleOnUpdatedTeacher} />
 				))}
 			</div>
 		</div>
