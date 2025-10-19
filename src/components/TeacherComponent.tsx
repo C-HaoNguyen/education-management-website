@@ -85,12 +85,12 @@ export default function TeacherComponent() {
 			<div className="flex justify-between items-center mb-4">
 				<h2 className="text-2xl font-bold text-gray-800">Teachers</h2>
 				{/* Thanh tìm kiếm (optional) */}
-				<div className="hidden md:block">
+				<div>
 					<div className="relative w-128">
 						<input
 							type="text"
-							placeholder="Search..."
-							className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
+							placeholder="Search by teacher name..."
+							className="w-full h-10 px-3 py-1 rounded text-black border-blue outline-blue-500"
 							onChange={(e) => setFilterValue(e.target.value)}
 						/>
 						<svg

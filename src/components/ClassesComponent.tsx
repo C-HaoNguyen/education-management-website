@@ -41,6 +41,10 @@ export default function ClassesComponent() {
         description: 'Toan',
     }]);
     const [isShowErrorMessage, setIsShowErrorMessage] = useState(false);
+    const [filterClassValue, setFilterClassValue] = useState("");
+    const [filterTeacherValue, setFilterTeacherValue] = useState("");
+    const [filterCourseValue, setFilterCourseValue] = useState("");
+
 
     useEffect(() => {
         refreshClassList();
@@ -208,10 +212,69 @@ export default function ClassesComponent() {
         setEditingClass({ ...editingClass, courseId: event.target.value });
     }
 
+    function handleSearch() {
+        const formData = new URLSearchParams();
+        formData.append("className", filterClassValue);
+        formData.append("teacherName", filterTeacherValue);
+        formData.append("courseName", filterCourseValue);
+
+        fetch("http://localhost:8080/classes/allDetailBySearch", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData.toString(),
+        })
+            .then(res => res.json())
+            .then(data => {
+                const sortedClasses = [...data].sort((a, b) =>
+                    a.className.localeCompare(b.className)
+                );
+                setClasses(sortedClasses);
+        });
+    }
+
     return (
         <div>
-            <h1 className="text-2xl font-bold mb-4">Class Management</h1>
-            <button className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={() => {
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold mb-4">Class Management</h1>
+                <div className="flex">
+                        {/* Class name input */}
+                        <div className="relative w-50 mr-2">
+                            <input
+                                type="text"
+                                placeholder="Search by class name..."
+                                className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
+                                onChange={(e) => setFilterClassValue(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Teacher name input */}
+                        <div className="relative w-50 mr-2">
+                            <input
+                                type="text"
+                                placeholder="Search by teacher name..."
+                                className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
+                                onChange={(e) => setFilterTeacherValue(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Course name input */}
+                        <div className="relative w-50 mr-2">
+                            <input
+                                type="text"
+                                placeholder="Search by course name..."
+                                className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
+                                onChange={(e) => setFilterCourseValue(e.target.value)}
+                            />
+                        </div>
+
+                        <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={() => handleSearch()}>
+                          Tìm Kiếm
+                        </button>
+                </div>
+            </div>
+            <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={() => {
                 setShowAddModal(true);
             }}>
                 + Add New Class

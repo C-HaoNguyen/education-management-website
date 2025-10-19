@@ -156,7 +156,7 @@ export default function CourseComponent() {
                     <div className="relative w-128">
                         <input
                             type="text"
-                            placeholder="Search..."
+                            placeholder="Search by course name..."
                             className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
                             onChange={(e) => setFilterValue(e.target.value)}
                         />
