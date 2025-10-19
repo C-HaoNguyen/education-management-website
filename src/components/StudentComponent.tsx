@@ -12,6 +12,7 @@ export default function StudentComponent() {
     const [editingStudent, setEditingStudent] = useState<any>(null);
     const [deletedStudent, setDeletedStudent] = useState<any>(null);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
+    const [filterValue, setFilterValue] = useState("");
 
     const [students, setStudents] = useState([{
         studentId: 1,
@@ -23,7 +24,7 @@ export default function StudentComponent() {
 
     useEffect(() => {
         refreshStudentList();
-    }, []);
+    }, [filterValue]);
 
     function refreshStudentList() {
         fetch("http://localhost:8080/students/all", {
@@ -34,7 +35,13 @@ export default function StudentComponent() {
                 const sortedStudents = [...data].sort((a, b) =>
                     a.studentName.localeCompare(b.studentName)
                 );
-                setStudents(sortedStudents);
+                // filter part
+                if (filterValue === "") {
+                    setStudents(sortedStudents);
+                } else {
+                    const filteredStudents = sortedStudents.filter(value => value.studentName.includes(filterValue));
+                    setStudents(filteredStudents);
+                }
             });
     }
 
@@ -122,7 +129,35 @@ export default function StudentComponent() {
 
     return (
         <div className="bg-white shadow rounded-lg p-6">
-            <h1 className="text-2xl font-bold mb-4">Student Management</h1>
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold mb-4">Student Management</h1>
+                {/* Thanh tìm kiếm (optional) */}
+                <div className="hidden md:block">
+                    <div className="relative w-128">
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
+                            onChange={(e) => setFilterValue(e.target.value)}
+                        />
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"
+                            />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
 
             {showAddModal ?
                 <div className="fixed inset-0 flex items-center justify-center z-50">
