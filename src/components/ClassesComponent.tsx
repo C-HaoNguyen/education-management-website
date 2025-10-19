@@ -110,6 +110,21 @@ export default function ClassesComponent() {
             setIsShowErrorMessage(true);
             return;
         }
+
+        if (!newClass.teacherId || newClass.teacherId.trim() === "") {
+            setIsShowErrorMessage(true);
+            return;     
+        }
+
+        if (!newClass.courseId || newClass.courseId.trim() === "") {
+            setIsShowErrorMessage(true);
+            return;     
+        }
+
+        if (!newClass.startDate || newClass.startDate.trim() === "") {
+            setIsShowErrorMessage(true);
+            return;     
+        }
         const formData = new URLSearchParams();
         formData.append("className", newClass.className);
         formData.append("teacherId", newClass.teacherId);
@@ -129,6 +144,15 @@ export default function ClassesComponent() {
         });
         setShowAddModal(false);
         setIsShowErrorMessage(false);
+        setNewClass({
+        classId: 0,
+        className: "",
+        teacherId: "",
+        teacherName: "",
+        courseId: "",
+        courseName: "",
+        startDate: ""
+    });
     }
 
     function handleCancelSaveClass() {
@@ -233,14 +257,14 @@ export default function ClassesComponent() {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Add new class</h2>
-                        {isShowErrorMessage ? <h5 className="text-red-500">Please enter class name</h5> : <></>}
+                        {isShowErrorMessage ? <h5 className="text-red-500">Please enter class name, choose teacher, choose course, choose start date before Save</h5> : <></>}
                         <h4> Class Name </h4> <input className="h-full w-full border border-green-200" value={newClass.className} onChange={(e) => setNewClass({ ...newClass, className: e.target.value })} />
                         <h4> Teacher </h4>
                         <select
                             id="teacher"
-                            value={newClass.teacherId}
                             onChange={handleAddNewTeacher}
                             className="border rounded p-2">
+                            <option>Please choose Teacher</option>    
                             {teachers.map((giaovien) => (
                                 <option value={giaovien.teacherId}>{giaovien.teacherName}</option>))
                             }
@@ -248,9 +272,9 @@ export default function ClassesComponent() {
                         <h4> Course Name </h4>
                         <select
                             id="course"
-                            value={newClass.courseId}
                             onChange={handleChangeCourseForNewClass}
                             className="border rounded p-2">
+                            <option>Please choose Course</option>
                             {courses.map((course) => (
                                 <option value={course.courseId}>{course.description}</option>))
                             }
