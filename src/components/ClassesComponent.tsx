@@ -44,7 +44,7 @@ export default function ClassesComponent() {
     const [filterClassValue, setFilterClassValue] = useState("");
     const [filterTeacherValue, setFilterTeacherValue] = useState("");
     const [filterCourseValue, setFilterCourseValue] = useState("");
-
+    const [filterStartDateValue, setFilterStartDateValue] = useState("");
 
     useEffect(() => {
         refreshClassList();
@@ -117,17 +117,17 @@ export default function ClassesComponent() {
 
         if (!newClass.teacherId || newClass.teacherId.trim() === "") {
             setIsShowErrorMessage(true);
-            return;     
+            return;
         }
 
         if (!newClass.courseId || newClass.courseId.trim() === "") {
             setIsShowErrorMessage(true);
-            return;     
+            return;
         }
 
         if (!newClass.startDate || newClass.startDate.trim() === "") {
             setIsShowErrorMessage(true);
-            return;     
+            return;
         }
         const formData = new URLSearchParams();
         formData.append("className", newClass.className);
@@ -149,14 +149,14 @@ export default function ClassesComponent() {
         setShowAddModal(false);
         setIsShowErrorMessage(false);
         setNewClass({
-        classId: 0,
-        className: "",
-        teacherId: "",
-        teacherName: "",
-        courseId: "",
-        courseName: "",
-        startDate: ""
-    });
+            classId: 0,
+            className: "",
+            teacherId: "",
+            teacherName: "",
+            courseId: "",
+            courseName: "",
+            startDate: ""
+        });
     }
 
     function handleCancelSaveClass() {
@@ -217,6 +217,12 @@ export default function ClassesComponent() {
         formData.append("className", filterClassValue);
         formData.append("teacherName", filterTeacherValue);
         formData.append("courseName", filterCourseValue);
+        formData.append("startDate", filterStartDateValue);
+        // if (!filterStartDateValue || filterStartDateValue.trim() === "") {
+        //     formData.append("startDate", "2025-10-22");
+        // } else {
+        //     formData.append("startDate", filterStartDateValue);
+        // }
 
         fetch("http://localhost:8080/classes/allDetailBySearch", {
             method: 'POST',
@@ -224,14 +230,14 @@ export default function ClassesComponent() {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             body: formData.toString(),
-        })
+        })  
             .then(res => res.json())
             .then(data => {
                 const sortedClasses = [...data].sort((a, b) =>
                     a.className.localeCompare(b.className)
                 );
                 setClasses(sortedClasses);
-        });
+            });
     }
 
     return (
@@ -239,39 +245,46 @@ export default function ClassesComponent() {
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold mb-4">Class Management</h1>
                 <div className="flex">
-                        {/* Class name input */}
-                        <div className="relative w-50 mr-2">
-                            <input
-                                type="text"
-                                placeholder="Search by class name..."
-                                className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
-                                onChange={(e) => setFilterClassValue(e.target.value)}
-                            />
-                        </div>
+                    {/* Class name input */}
+                    <div className="relative w-50 mr-2">
+                        <input
+                            type="text"
+                            placeholder="Search by class name..."
+                            className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
+                            onChange={(e) => setFilterClassValue(e.target.value)}
+                        />
+                    </div>
 
-                        {/* Teacher name input */}
-                        <div className="relative w-50 mr-2">
-                            <input
-                                type="text"
-                                placeholder="Search by teacher name..."
-                                className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
-                                onChange={(e) => setFilterTeacherValue(e.target.value)}
-                            />
-                        </div>
+                    {/* Teacher name input */}
+                    <div className="relative w-50 mr-2">
+                        <input
+                            type="text"
+                            placeholder="Search by teacher name..."
+                            className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
+                            onChange={(e) => setFilterTeacherValue(e.target.value)}
+                        />
+                    </div>
 
-                        {/* Course name input */}
-                        <div className="relative w-50 mr-2">
-                            <input
-                                type="text"
-                                placeholder="Search by course name..."
-                                className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
-                                onChange={(e) => setFilterCourseValue(e.target.value)}
-                            />
-                        </div>
+                    {/* Course name input */}
+                    <div className="relative w-50 mr-2">
+                        <input
+                            type="text"
+                            placeholder="Search by course name..."
+                            className="w-full h-10 px-3 py-1 rounded bg-white text-black border-gray focus:outline-blue-500"
+                            onChange={(e) => setFilterCourseValue(e.target.value)}
+                        />
+                    </div>
 
-                        <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={() => handleSearch()}>
-                          Tìm Kiếm
-                        </button>
+                    <div className="flex items-center mr-2">
+                        <h4>Start date: </h4>
+                    </div>
+                    <div className="relative w-50 mr-2">
+                        <input type="date" className="h-full w-full border border-green-200" onChange={(e) => setFilterStartDateValue(e.target.value)} />
+                    </div>
+
+                    <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={() => handleSearch()}>
+                        Tìm Kiếm
+                    </button>
                 </div>
             </div>
             <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={() => {
@@ -327,7 +340,7 @@ export default function ClassesComponent() {
                             id="teacher"
                             onChange={handleAddNewTeacher}
                             className="border rounded p-2">
-                            <option>Please choose Teacher</option>    
+                            <option>Please choose Teacher</option>
                             {teachers.map((giaovien) => (
                                 <option value={giaovien.teacherId}>{giaovien.teacherName}</option>))
                             }
