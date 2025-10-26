@@ -17,6 +17,11 @@ export default function HeaderComponent() {
                         className="w-10 h-10 rounded-full border border-gray-300"
                     />
                 </div>
+
+                {/* Login button */}
+                <a href="/login" className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+                    Đăng nhập
+                </a>
             </header>
         );
 }
