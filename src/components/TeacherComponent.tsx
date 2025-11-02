@@ -60,15 +60,41 @@ export default function TeacherComponent() {
 		refreshTeacherList();
 	}
 
-	function refreshTeacherList() {
-		const token = localStorage.getItem("access_token");
-		fetch("http://localhost:8080/teachers/all", {
+	async function refreshTeacherList() {
+		const token = localStorage.getItem("accessToken");
+		const response = await fetch("http://localhost:8080/teachers/all", {
 			headers: {
 				"Authorization": `Bearer ${token}`
 			}
-		})
-			.then(res => res.json())
-			.then(data => {
+		});
+
+		if (response.status === 401 || response.status === 403) {
+      	console.warn("Access token expired — trying to refresh...");
+		const refreshToken = localStorage.getItem("refreshToken");
+      	if (!refreshToken) {
+        	console.error("No refresh token found — please login again");
+        	handleLogout();
+        return;
+      	}
+
+      	// Gọi API refresh token
+      	const refreshResponse = await fetch(`http://localhost:8080/auth/refresh?refreshToken=${refreshToken}`, {
+        method: "POST",
+      	});
+
+      	if (!refreshResponse.ok) {
+        	console.error("Refresh token invalid or expired — logging out");
+        	handleLogout();
+        	return;
+      	}
+
+      	// Nhận token mới
+      	const refreshData = await refreshResponse.json();
+      	localStorage.setItem("accessToken", refreshData.accessToken);
+		// Thử lại việc lấy danh sách giáo viên với token mới
+		await refreshTeacherList();
+		} else {
+			const data = await response.json()
 				const sortedTeachers = [...data].sort((a, b) =>
 					a.teacherName.localeCompare(b.teacherName)
 				);
@@ -79,9 +105,14 @@ export default function TeacherComponent() {
 					const filteredTeachers = sortedTeachers.filter(value => value.teacherName.includes(filterValue));
 					setTeachers(filteredTeachers);
 				}
-			});
+			}
 	}
-
+	
+	function handleLogout() {
+  		localStorage.removeItem("accessToken");
+  		localStorage.removeItem("refreshToken");
+  		window.location.href = "/login";
+	}
 
 	return (
 		<div className="bg-white h-full p-6 rounded-lg shadow">
@@ -148,4 +179,5 @@ export default function TeacherComponent() {
 			</div>
 		</div>
 	);
+
 }

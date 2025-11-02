@@ -1,10 +1,16 @@
 import {Link} from "react-router-dom";
 
 export default function Sidebar() {
+
+    function isLoggedIn() {
+        const accessToken = localStorage.getItem("accessToken");
+        return accessToken !== null;
+    }
     return (
         <div className="h-screen w-64 bg-gray-800 text-white flex flex-col">
 
             {/* Menu */}
+            {isLoggedIn() &&    
             <nav className="flex-1 p-2">
                 <ul className="space-y-2">
                     <li>
@@ -34,13 +40,7 @@ export default function Sidebar() {
                     </li>
                 </ul>
             </nav>
-
-            {/* Footer */}
-            <div className="p-4 border-t border-gray-700">
-                <button className="w-full bg-red-500 hover:bg-red-600 px-4 py-2 rounded">
-                    Logout
-                </button>
-            </div>
+            }
         </div>
     );
 }

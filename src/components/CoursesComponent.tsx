@@ -17,7 +17,7 @@ export default function CourseComponent() {
 
 
     useEffect(() => {
-        const token = localStorage.getItem("access_token");
+        const token = localStorage.getItem("accessToken");
         fetch("http://localhost:8080/courses/all", {
         headers: {
           "Authorization": `Bearer ${token}`

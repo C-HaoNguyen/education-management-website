@@ -20,6 +20,7 @@ export default function LogInComponent() {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
         console.log("Đăng nhập thành công, token:", data.accessToken);
+        window.location.href = "/";
     };
 
     return (

@@ -7,6 +7,7 @@ import TeacherComponent from "./components/TeacherComponent";
 import StudentComponent from "./components/StudentComponent";
 import ClassesComponent from './components/ClassesComponent';
 import LogInComponent from './components/LogInComponent';   
+import WelcomeComponent from './components/WelcomeComponent';
 
 function App() {
     return <>
@@ -21,6 +22,7 @@ function App() {
                         <Route path="/student" element={<StudentComponent/>}></Route>
                         <Route path="/classes" element={<ClassesComponent/>}></Route>
                         <Route path="/login" element={<LogInComponent/>}></Route>
+                        <Route path="/" element={<WelcomeComponent/>}></Route>
                     </Routes>
                 </div>
             </div>
