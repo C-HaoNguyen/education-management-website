@@ -16,10 +16,12 @@ export default function LogInComponent() {
             },
             body: formData.toString(),
         });
-        const token = await response.text();
-        localStorage.setItem("access_token", token);
-        console.log("Đăng nhập thành công, token:", token);
+        const data = await response.json();
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        console.log("Đăng nhập thành công, token:", data.accessToken);
     };
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <form

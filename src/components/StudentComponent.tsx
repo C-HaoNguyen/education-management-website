@@ -27,8 +27,11 @@ export default function StudentComponent() {
     }, [filterValue]);
 
     function refreshStudentList() {
+        const token = localStorage.getItem("access_token");
         fetch("http://localhost:8080/students/all", {
-            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
         })
             .then(res => res.json())
             .then(data => {

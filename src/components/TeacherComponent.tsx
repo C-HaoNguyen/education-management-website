@@ -61,8 +61,11 @@ export default function TeacherComponent() {
 	}
 
 	function refreshTeacherList() {
+		const token = localStorage.getItem("access_token");
 		fetch("http://localhost:8080/teachers/all", {
-			method: 'GET',
+			headers: {
+				"Authorization": `Bearer ${token}`
+			}
 		})
 			.then(res => res.json())
 			.then(data => {
