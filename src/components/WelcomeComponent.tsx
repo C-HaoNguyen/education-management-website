@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { isLoggedIn } from "../utils/AuthUtils";
 
 function WelcomeComponent() {
   const navigate = useNavigate();
@@ -21,13 +22,13 @@ function WelcomeComponent() {
         Manage your courses, teachers, and students easily.
       </p>
 
-      <div className="flex gap-4">
+      {isLoggedIn() ? "" :<div className="flex gap-4">
         <a href="/login"
           className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
         >
           Please login to continue.
         </a>
-      </div>
+      </div>}
     </div>
   );
 }

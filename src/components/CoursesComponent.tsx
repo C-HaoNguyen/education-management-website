@@ -17,30 +17,34 @@ export default function CourseComponent() {
 
 
     useEffect(() => {
+        refreshCourseList();
+    }, [filterValue]); //dependency object
+
+    async function refreshCourseList() {
         const token = localStorage.getItem("accessToken");
-        fetch("http://localhost:8080/courses/all", {
+        const response = await fetch("http://localhost:8080/courses/all", {
         headers: {
           "Authorization": `Bearer ${token}`
         }
-        })
-            .then(response => response.json())
-            .then(data => {
-                // sort part
-                const sortedCourses = [...data].sort((a, b) =>
-                    a.description.localeCompare(b.description)
-                );
-                // filter part
-                if (filterValue === "") {
-                    setCourses(sortedCourses);
-                } else {
-                    const filteredCourses = sortedCourses.filter(value => value.description.includes(filterValue));
-                    setCourses(filteredCourses)
-                }
+        });
 
-            })
-            .catch(error => console.error("Error:", error));
-            
-    }, [filterValue]); //dependency object
+        if (response.status === 401 || response.status === 403) {
+            window.location.href = "/login";
+            return;
+        }
+        const data = await response.json();
+        // sort part
+        const sortedCourses = [...data].sort((a, b) =>
+                    a.description.localeCompare(b.description)
+        );
+        // filter part
+        if (filterValue === "") {
+            setCourses(sortedCourses);
+        } else {
+            const filteredCourses = sortedCourses.filter(value => value.description.includes(filterValue));
+            setCourses(filteredCourses)
+        }
+    }
 
     function checkTimeValue(event: ChangeEvent<HTMLInputElement>) {
         const newValue = event.target.value;
@@ -58,28 +62,21 @@ export default function CourseComponent() {
             alert("Vui lòng nhập tên khóa học!");
             return;
         }
+        const token = localStorage.getItem("accessToken");
         const formData = new URLSearchParams();
         formData.append("courseDescription", newCourseName);
         const response = fetch('http://localhost:8080/courses/add', {
             method: 'POST',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${token}`
             },
             body: formData.toString(),
         });
 
         response.then(() => {
             // fetch updated list
-            fetch("http://localhost:8080/courses/all", {
-                method: 'GET',
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const sortedCourses = [...data].sort((a, b) =>
-                        a.description.localeCompare(b.description)
-                    );
-                    setCourses(sortedCourses)
-                });
+            refreshCourseList();
         });
         setNewCourseName('');
         setShowAddModal(false);
@@ -97,6 +94,7 @@ export default function CourseComponent() {
     }
 
     function handleEditCourse() {
+        const token = localStorage.getItem("accessToken");
         const formData = new URLSearchParams();
         formData.append("id", editingCourse.courseId.toString());
         formData.append("courseDescription", editingCourse.description);
@@ -104,50 +102,40 @@ export default function CourseComponent() {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${token}`
+
             },
             body: formData.toString(),
         });
 
         response.then(() => {
             // fetch updated list
-            fetch("http://localhost:8080/courses/all", {
-                method: 'GET',
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const sortedCourses = [...data].sort((a, b) =>
-                        a.description.localeCompare(b.description)
-                    );
-                    setCourses(sortedCourses)
-                });
+            refreshCourseList();
         });
         setShowEditModal(false);
     }
 
-    function handleDeleteCourse() {
+    async function handleDeleteCourse() {
+
+        const token = localStorage.getItem("accessToken");
         const formData = new URLSearchParams();
         formData.append("id", deletedCourse.courseId.toString());
-        const response = fetch('http://localhost:8080/courses/delete', {
+        const response = await fetch('http://localhost:8080/courses/delete', {
             method: 'DELETE',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${token}`
             },
             body: formData.toString(),
         });
 
-        response.then(() => {
-            // fetch updated list
-            fetch("http://localhost:8080/courses/all", {
-                method: 'GET',
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const sortedCourses = [...data].sort((a, b) =>
-                        a.description.localeCompare(b.description)
-                    );
-                    setCourses(sortedCourses)
-                });
-        });
+        if (response.status === 400) {
+            alert("Cannot delete this course because it is associated with existing students or teachers.");
+            setShowConfirmDeleteModal(false);
+            return;
+        }
+
+        refreshCourseList();
         setShowConfirmDeleteModal(false);
     }
 
