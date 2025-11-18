@@ -1,5 +1,6 @@
 import { Edit, Trash2 } from "lucide-react";
 import { ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
+import { getAccessToken } from "../utils/AuthUtils";
 
 export default function ClassesComponent() {
     const [isShowConfirmDeleteModal, setIsShowConfirmDeleteModal] = useState(false);
@@ -52,22 +53,32 @@ export default function ClassesComponent() {
         refreshCourseList();
     }, []);
 
-    function refreshTeacherList() {
-        fetch("http://localhost:8080/teachers/all", {
+    async function refreshTeacherList() {
+        const response = await fetch("http://localhost:8080/teachers/all", {
             method: 'GET',
-        })
-            .then(res => res.json())
-            .then(data => {
-                const sortedTeachers = [...data].sort((a, b) =>
-                    a.teacherName.localeCompare(b.teacherName)
-                );
-                setTeachers(sortedTeachers);
-            });
+            headers: {
+                "Authorization": `Bearer ${getAccessToken()}`,
+            }
+        });
+
+        if (response.status == 401 || response.status == 403) {
+            window.location.href = "/login";
+            return;
+        }
+
+        const data = await response.json();
+        const sortedTeachers = [...data].sort((a, b) =>
+            a.teacherName.localeCompare(b.teacherName)
+        );
+        setTeachers(sortedTeachers);
     }
 
     function refreshClassList() {
         fetch("http://localhost:8080/classes/allDetail", {
             method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${getAccessToken()}`,
+            }
         })
             .then(res => res.json())
             .then(data => {
@@ -81,6 +92,9 @@ export default function ClassesComponent() {
     function refreshCourseList() {
         fetch("http://localhost:8080/courses/all", {
             method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${getAccessToken()}`,
+            }
         })
             .then(res => res.json())
             .then(data => {
@@ -91,25 +105,23 @@ export default function ClassesComponent() {
             });
     }
 
-    function handleDeleteClass() {
+    async function handleDeleteClass() {
         const formData = new URLSearchParams();
         formData.append("classId", deletedClass.classId.toString());
-        const response = fetch('http://localhost:8080/classes/delete', {
+        await fetch('http://localhost:8080/classes/delete', {
             method: 'DELETE',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${getAccessToken()}`,
             },
             body: formData.toString(),
         });
 
-        response.then(() => {
-            // fetch updated list
-            refreshClassList();
-        });
+        refreshClassList();
         setIsShowConfirmDeleteModal(false);
     }
 
-    function handleSaveClass() {
+    async function handleSaveClass() {
         if (!newClass.className || newClass.className.trim() === "") {
             setIsShowErrorMessage(true);
             return;
@@ -134,18 +146,16 @@ export default function ClassesComponent() {
         formData.append("teacherId", newClass.teacherId);
         formData.append("courseId", newClass.courseId);
         formData.append("startDate", newClass.startDate);
-        const response = fetch('http://localhost:8080/classes/add', {
+        await fetch('http://localhost:8080/classes/add', {
             method: 'POST',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${getAccessToken()}`,
             },
             body: formData.toString(),
         });
 
-        response.then(() => {
-            // fetch updated list
-            refreshClassList();
-        });
+        refreshClassList();
         setShowAddModal(false);
         setIsShowErrorMessage(false);
         setNewClass({
@@ -164,7 +174,7 @@ export default function ClassesComponent() {
         setIsShowErrorMessage(false);
     }
 
-    function handleUpdateClass() {
+    async function handleUpdateClass() {
         if (!editingClass.className || editingClass.className.trim() === "") {
             setIsShowErrorMessage(true);
             return;
@@ -175,18 +185,16 @@ export default function ClassesComponent() {
         formData.append("teacherId", editingClass.teacherId);
         formData.append("courseId", editingClass.courseId);
         formData.append("startDate", editingClass.startDate);
-        const response = fetch('http://localhost:8080/classes/update', {
+        await fetch('http://localhost:8080/classes/update', {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${getAccessToken()}`,
             },
             body: formData.toString(),
         });
 
-        response.then(() => {
-            // fetch updated list
-            refreshClassList();
-        });
+        refreshClassList();
         setShowEditModal(false);
         setIsShowErrorMessage(false);
     }
@@ -228,9 +236,10 @@ export default function ClassesComponent() {
             method: 'POST',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${getAccessToken()}`,
             },
             body: formData.toString(),
-        })  
+        })
             .then(res => res.json())
             .then(data => {
                 const sortedClasses = [...data].sort((a, b) =>

@@ -1,4 +1,5 @@
 import { ChangeEvent, useState, useEffect, ChangeEventHandler } from "react";
+import { getAccessToken } from "../utils/AuthUtils";
 
 export default function CourseComponent() {
 
@@ -21,11 +22,10 @@ export default function CourseComponent() {
     }, [filterValue]); //dependency object
 
     async function refreshCourseList() {
-        const token = localStorage.getItem("accessToken");
         const response = await fetch("http://localhost:8080/courses/all", {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
+            headers: {
+                "Authorization": `Bearer ${getAccessToken()}`
+            }
         });
 
         if (response.status === 401 || response.status === 403) {
@@ -35,7 +35,7 @@ export default function CourseComponent() {
         const data = await response.json();
         // sort part
         const sortedCourses = [...data].sort((a, b) =>
-                    a.description.localeCompare(b.description)
+            a.description.localeCompare(b.description)
         );
         // filter part
         if (filterValue === "") {
@@ -154,11 +154,11 @@ export default function CourseComponent() {
                             onChange={(e) => setFilterValue(e.target.value)}
                         />
                         <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                         >
                             <path
                                 strokeLinecap="round"

@@ -1,5 +1,6 @@
 import { Edit, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getAccessToken } from "../utils/AuthUtils";
 
 export default function StudentComponent() {
 
@@ -26,29 +27,31 @@ export default function StudentComponent() {
         refreshStudentList();
     }, [filterValue]);
 
-    function refreshStudentList() {
-        const token = localStorage.getItem("access_token");
-        fetch("http://localhost:8080/students/all", {
+    async function refreshStudentList() {
+        const response = await fetch("http://localhost:8080/students/all", {
             headers: {
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${getAccessToken()}`
             }
-        })
-            .then(res => res.json())
-            .then(data => {
-                const sortedStudents = [...data].sort((a, b) =>
-                    a.studentName.localeCompare(b.studentName)
-                );
-                // filter part
-                if (filterValue === "") {
-                    setStudents(sortedStudents);
-                } else {
-                    const filteredStudents = sortedStudents.filter(value => value.studentName.includes(filterValue));
-                    setStudents(filteredStudents);
-                }
-            });
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            window.location.href = "/login";
+            return;
+        }
+        const data = await response.json();
+        const sortedStudents = [...data].sort((a, b) =>
+            a.studentName.localeCompare(b.studentName)
+        );
+        // filter part
+        if (filterValue === "") {
+            setStudents(sortedStudents);
+        } else {
+            const filteredStudents = sortedStudents.filter(value => value.studentName.includes(filterValue));
+            setStudents(filteredStudents);
+        }
     }
 
-    function handleSaveNewStudent() {
+    async function handleSaveNewStudent() {
         if (newStudentName == '' || newEmail == '' || newBirthday == '' || newPhoneNumber == '') {
             alert("Vui lòng nhập đầy đủ thông tin!");
             return;
@@ -58,18 +61,16 @@ export default function StudentComponent() {
         formData.append("email", newEmail);
         formData.append("birthday", newBirthday);
         formData.append("phoneNumber", newPhoneNumber);
-        const response = fetch('http://localhost:8080/students/add', {
+        await fetch('http://localhost:8080/students/add', {
             method: 'POST',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${getAccessToken()}`
             },
             body: formData.toString(),
         });
 
-        response.then(() => {
-            // fetch updated list
-            refreshStudentList();
-        });
+        refreshStudentList();
         resetNewStudent();
         setShowAddModal(false);
     }
@@ -79,25 +80,22 @@ export default function StudentComponent() {
         setShowAddModal(false);
     }
 
-    function handleUpdateStudent() {
+    async function handleUpdateStudent() {
         const formData = new URLSearchParams();
         formData.append("studentId", editingStudent.studentId.toString());
         formData.append("studentName", editingStudent.studentName);
         formData.append("email", editingStudent.email);
         formData.append("birthday", editingStudent.birthday);
         formData.append("phoneNumber", editingStudent.phoneNumber);
-        const response = fetch('http://localhost:8080/students/update', {
+        await fetch('http://localhost:8080/students/update', {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${getAccessToken()}`
             },
             body: formData.toString(),
         });
-
-        response.then(() => {
-            // fetch updated list
-            refreshStudentList();
-        });
+        refreshStudentList();
         setShowEditModal(false);
     }
 
@@ -112,21 +110,19 @@ export default function StudentComponent() {
         setNewPhoneNumber('');
     }
 
-    function handleDeleteStudent() {
+    async function handleDeleteStudent() {
         const formData = new URLSearchParams();
         formData.append("id", deletedStudent.studentId.toString());
-        const response = fetch('http://localhost:8080/students/delete', {
+        await fetch('http://localhost:8080/students/delete', {
             method: 'DELETE',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${getAccessToken()}`
             },
             body: formData.toString(),
         });
 
-        response.then(() => {
-            // fetch updated list
-            refreshStudentList();
-        });
+        refreshStudentList();
         setShowConfirmDeleteModal(false);
     }
 
