@@ -2,6 +2,7 @@ import { useState } from 'react';
 import avatar from '../assets/user-avatar.jpg';
 import {jwtDecode} from "jwt-decode";
 import {isLoggedIn} from "../utils/AuthUtils";
+import {getUsername} from "../utils/AuthUtils";
 
 export default function HeaderComponent() {
     const [username, setUsername] = useState("")
@@ -29,7 +30,7 @@ export default function HeaderComponent() {
 
                 {/* User info */}
                 {isLoggedIn() ? <div className="flex items-center gap-3">
-                    <span className="hidden sm:block">Hi</span>
+                    <span className="hidden sm:block">Hi {getUsername()}</span>
                     <img
                         src={avatar}
                         alt="User Avatar"
