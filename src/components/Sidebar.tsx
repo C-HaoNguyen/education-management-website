@@ -20,30 +20,30 @@ export default function Sidebar() {
                         </a>}
                     </li>
                     <li>
-                        <a href="/teacher" className="block p-2 rounded hover:bg-gray-700 transition">
+                        {getUserRole() === "admin" && <a href="/teacher" className="block p-2 rounded hover:bg-gray-700 transition">
                             Teacher Management
-                        </a>
+                        </a>}
                     </li>
                     <li>
-                        <a href="/student" className="block p-2 rounded hover:bg-gray-700 transition">
+                        {getUserRole() === "admin" && <a href="/student" className="block p-2 rounded hover:bg-gray-700 transition">
                             Student Management
-                        </a>
+                        </a>}
                     </li>
                     <li>
-                        <a href="/classes" className="block p-2 rounded hover:bg-gray-700 transition">
+                        {getUserRole() === "admin" && <a href="/classes" className="block p-2 rounded hover:bg-gray-700 transition">
                             Class Management
-                        </a>
+                        </a>}
                     </li>
                     <li>
-                        <a href="#" className="block p-2 rounded hover:bg-gray-700 transition">
+                        {getUserRole() === "admin" && <a href="#" className="block p-2 rounded hover:bg-gray-700 transition">
                             Settings
-                        </a>
+                        </a>}
                     </li>
 
                     <li>
-                        <a href="/available-courses" className="block p-2 rounded hover:bg-gray-700 transition">
+                        {getUserRole() === "student" && <a href="/available-courses" className="block p-2 rounded hover:bg-gray-700 transition">
                             Available Courses
-                        </a>
+                        </a>}
                     </li>
                 </ul>
             </nav>

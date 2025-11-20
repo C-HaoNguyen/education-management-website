@@ -2,14 +2,6 @@ import { ChangeEvent, useState, useEffect, ChangeEventHandler } from "react";
 import { getAccessToken, getUserRole } from "../utils/AuthUtils";
 
 export default function CourseComponent() {
-
-    if (!getAccessToken()) {
-        window.location.href = "/login";
-    }
-    if (getUserRole() !== "admin") {
-        window.location.href = "/no-permission";
-    }
-
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
