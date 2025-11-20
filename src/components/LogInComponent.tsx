@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getUserRole } from "../utils/AuthUtils";
 
 
 export default function LogInComponent() {
@@ -16,10 +17,15 @@ export default function LogInComponent() {
             },
             body: formData.toString(),
         });
+        if (!response.ok) {
+            alert("Đăng nhập thất bại!");
+            return;
+        }
         const data = await response.json();
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
         console.log("Đăng nhập thành công, token:", data.accessToken);
+        alert("Quyền truy cập: " + getUserRole());
         window.location.href = "/";
     };
 

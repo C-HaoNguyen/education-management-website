@@ -1,4 +1,5 @@
 import {Link} from "react-router-dom";
+import { getUserRole } from "../utils/AuthUtils";
 
 export default function Sidebar() {
 
@@ -14,9 +15,9 @@ export default function Sidebar() {
             <nav className="flex-1 p-2">
                 <ul className="space-y-2">
                     <li>
-                        <a href="/course" className="block p-2 rounded hover:bg-gray-700 transition">
+                        {getUserRole() === "admin" && <a href="/course" className="block p-2 rounded hover:bg-gray-700 transition">
                             Course Management
-                        </a>
+                        </a>}
                     </li>
                     <li>
                         <a href="/teacher" className="block p-2 rounded hover:bg-gray-700 transition">
@@ -36,6 +37,12 @@ export default function Sidebar() {
                     <li>
                         <a href="#" className="block p-2 rounded hover:bg-gray-700 transition">
                             Settings
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/available-courses" className="block p-2 rounded hover:bg-gray-700 transition">
+                            Available Courses
                         </a>
                     </li>
                 </ul>

@@ -9,6 +9,9 @@ import ClassesComponent from './components/ClassesComponent';
 import LogInComponent from './components/LogInComponent';   
 import WelcomeComponent from './components/WelcomeComponent';
 import SignUpComponent from './components/SignUpComponent';
+import AvailableCourses from "./components/AvaialableCourses";
+import NoPermissionComponent from "./components/NoPermissionComponent";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
     return <>
@@ -18,13 +21,20 @@ function App() {
                 <Sidebar/>
                 <div className="flex-1 bg-gray-200 p-4 overflow-y-auto">
                     <Routes>
-                        <Route path="/course" element={<CourseComponent/>}></Route>
+                        // ADMIN ROUTES
+                        <Route path="/course" element={<ProtectedRoute requireRole={"admin"}><CourseComponent/></ProtectedRoute>}/>
                         <Route path="/teacher" element={<TeacherComponent/>}></Route>
                         <Route path="/student" element={<StudentComponent/>}></Route>
                         <Route path="/classes" element={<ClassesComponent/>}></Route>
                         <Route path="/login" element={<LogInComponent/>}></Route>
                         <Route path="/" element={<WelcomeComponent/>}></Route>
                         <Route path="/signup" element={<SignUpComponent/>}></Route>
+
+                        // STUDENT ROUTES
+                        <Route path="/available-courses" element={<AvailableCourses/>}></Route>
+
+                        // FALLBACK ROUTE
+                        <Route path="/no-permission" element={<NoPermissionComponent/>}></Route>
                     </Routes>
                 </div>
             </div>

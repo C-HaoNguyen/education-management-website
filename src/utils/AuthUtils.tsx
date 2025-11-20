@@ -17,3 +17,10 @@ export function getUsername() {
         const decodedToken = jwtDecode(token);
         return decodedToken.sub;
 }
+
+export function getUserRole() {
+        const token = getAccessToken();
+        if (!token) return null;
+        const decodedToken = jwtDecode(token);
+        return decodedToken.role;
+}
