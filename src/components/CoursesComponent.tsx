@@ -5,7 +5,6 @@ export default function CourseComponent() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
-    const [course, setCourse] = useState({ name: 'Spring Boot', time: 5 })
     const [editingCourse, setEditingCourse] = useState({ courseId: 0, description: "Default" });
     const [deletedCourse, setDeletedCourse] = useState({ courseId: 0, description: "Default" });
     const [courses, setCourses] = useState([{

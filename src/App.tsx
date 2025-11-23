@@ -12,6 +12,7 @@ import SignUpComponent from './components/SignUpComponent';
 import AvailableCourses from "./components/AvaialableCourses";
 import NoPermissionComponent from "./components/NoPermissionComponent";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CourseDetails from './components/CourseDetails';
 
 function App() {
     return <>
@@ -52,6 +53,7 @@ function App() {
 
                         // STUDENT ROUTES
                         <Route path="/available-courses" element={<AvailableCourses />}></Route>
+                        <Route path="/course-details" element={<CourseDetails />}></Route>
 
                         // FALLBACK ROUTE
                         <Route path="/no-permission" element={<NoPermissionComponent />}></Route>
