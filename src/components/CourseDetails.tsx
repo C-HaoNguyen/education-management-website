@@ -55,17 +55,38 @@ export default function CourseDetails() {
 
     return (
         <>
-            <div>Course Details</div>
-            <div>
-                <label htmlFor="description">Description: {course.description}</label>
+            <div className="flex items-center mb-6">
+                <div>
+                    <button
+                        className="mb-4 px-4 py-2 bg-gray-300 text-black rounded-lg hover:bg-gray-400"
+                        onClick={() => {
+                            window.history.back();
+                        }}
+                    >
+                        Back
+                    </button>
+                </div>
+
+                <div className="w-full text-center font-bold text-xl mb-4">
+                    <div>Course Details</div>
+                </div>
+            </div>
+
+            <div className="flex">
+                <label className="font-bold">Description:</label>
+                <div>{course.description}</div>
+            </div>
+
+            <div className="flex">
+                <label className="font-bold">Duration: </label>
+                <div>{course.duration} months</div>
             </div>
 
             <div>
-                <label htmlFor="duration">Duration: {course.duration} months</label>
-            </div>
-            
-            <div>
-                <label htmlFor="details">Details: {course.details}</label>
+                <div className="font-bold">Details:</div>
+                <div className="p-4 border border-gray-300 rounded-lg mt-2" style={{ whiteSpace: "pre-line" }}>
+                    {course.details}
+                </div>
             </div>
         </>
     );

@@ -5,13 +5,22 @@ export default function CourseComponent() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
-    const [editingCourse, setEditingCourse] = useState({ courseId: 0, description: "Default" });
+    const [editingCourse, setEditingCourse] = useState({
+        courseId: 0,
+        description: "Default",
+        duration: 0,
+        details: ""
+    });
     const [deletedCourse, setDeletedCourse] = useState({ courseId: 0, description: "Default" });
     const [courses, setCourses] = useState([{
         courseId: 1,
-        description: "Default Courses"
+        description: "Default Courses",
+        duration: 4,
+        details: "Default Details"
     }]);
     const [newCourseName, setNewCourseName] = useState("");
+    const [newCourseDuration, setNewCourseDuration] = useState(0);
+    const [newCourseDetails, setNewCourseDetails] = useState("");
     const [filterValue, setFilterValue] = useState("");
 
 
@@ -60,9 +69,22 @@ export default function CourseComponent() {
             alert("Vui lòng nhập tên khóa học!");
             return;
         }
+
+        if (newCourseDuration <= 0) {
+            alert("Vui lòng nhập thời lượng khóa học hợp lệ!");
+            return;
+        }
+
+        if (newCourseDetails == '') {
+            alert("Vui lòng nhập chi tiết khóa học!");
+            return;
+        }
+
         const token = localStorage.getItem("accessToken");
         const formData = new URLSearchParams();
         formData.append("courseDescription", newCourseName);
+        formData.append("duration", newCourseDuration.toString());
+        formData.append("details", newCourseDetails);
         const response = fetch('http://localhost:8080/courses/add', {
             method: 'POST',
             headers: {
@@ -77,6 +99,8 @@ export default function CourseComponent() {
             refreshCourseList();
         });
         setNewCourseName('');
+        setNewCourseDuration(0);
+        setNewCourseDetails('');
         setShowAddModal(false);
     }
 
@@ -91,17 +115,43 @@ export default function CourseComponent() {
         editingCourse.description = newUpdatingCourseName;
     }
 
+    function handleEditCourseDuration(e: ChangeEvent<HTMLInputElement>) {
+        const newUpdatingCourseDuration = Number(e.target.value);
+        editingCourse.duration = newUpdatingCourseDuration;
+    }
+
+    function handleEditCourseDetails(e: ChangeEvent<HTMLTextAreaElement>) {
+        const newUpdatingCourseDetails = e.target.value;
+        editingCourse.details = newUpdatingCourseDetails;
+    }
+
     function handleEditCourse() {
+        if (editingCourse.description == '') {
+            alert("Tên khóa học không được để trống!");
+            return;
+        }
+
+        if (editingCourse.duration !== undefined && editingCourse.duration <= 0) {
+            alert("Vui lòng nhập thời lượng khóa học hợp lệ!");
+            return;
+        }
+
+        if (editingCourse.details !== undefined && editingCourse.details == '') {
+            alert("Vui lòng nhập chi tiết khóa học!");
+            return;
+        }
+
         const token = localStorage.getItem("accessToken");
         const formData = new URLSearchParams();
         formData.append("id", editingCourse.courseId.toString());
         formData.append("courseDescription", editingCourse.description);
+        formData.append("duration", editingCourse.duration?.toString() || "0");
+        formData.append("details", editingCourse.details || "");
         const response = fetch('http://localhost:8080/courses/update', {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Authorization": `Bearer ${token}`
-
             },
             body: formData.toString(),
         });
@@ -179,7 +229,18 @@ export default function CourseComponent() {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Add New Course</h2>
-                        <h4> Course Name:</h4> <input className="h-full w-full border border-green-200" value={newCourseName} onChange={(e) => setNewCourseName(e.target.value)} />
+                        <h4> Course Name:</h4> <input className="h-full w-full border border-green-200"
+                            value={newCourseName}
+                            onChange={(e) => setNewCourseName(e.target.value)} />
+
+                        <h4> Duration:</h4> <input className="h-full w-full border border-green-200"
+                            value={newCourseDuration} type="number"
+                            onChange={(e) => setNewCourseDuration(Number(e.target.value))} />
+
+                        <h4> Details:</h4> <input className="h-full w-full border border-green-200"
+                            value={newCourseDetails}
+                            onChange={(e) => setNewCourseDetails(e.target.value)} />
+
                         <div className="pt-2">
                             <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700  mr-2"
                                 onClick={handleSaveNewCourse}>
@@ -199,7 +260,25 @@ export default function CourseComponent() {
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Edit Course</h2>
                         <h4> Course Name: </h4>
-                        <input className="h-full w-full border border-green-200" defaultValue={editingCourse.description} onChange={handleEditCourseName} />
+                        <input className="h-full w-full border border-green-200"
+                            defaultValue={editingCourse.description} onChange={handleEditCourseName} />
+
+                        <h4> Duration: </h4>
+                        <input className="h-full w-full border border-green-200"
+                            defaultValue={editingCourse.duration} type="number"
+                            onChange={handleEditCourseDuration} />
+
+                        <h4> Details: </h4>
+                        <textarea
+                            rows={5}
+                            cols={40}
+                            placeholder="Nhập nội dung dài tại đây..."
+                            className="h-full w-full border border-green-200"
+                            maxLength={2000}
+                            defaultValue={editingCourse.details}
+                            onChange={handleEditCourseDetails}
+                        ></textarea>
+
                         <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700  mr-2"
                             onClick={handleEditCourse}>
                             Save
@@ -247,6 +326,8 @@ export default function CourseComponent() {
                 <thead>
                     <tr className="bg-gray-200">
                         <th className="p-3 text-left">Course Name</th>
+                        <th className="p-3 text-left">Duration</th>
+                        <th className="p-3 text-left">Details</th>
                         <th className="p-3 text-left">Actions</th>
                     </tr>
                 </thead>
@@ -254,6 +335,19 @@ export default function CourseComponent() {
                     {courses.map((course) => (
                         <tr key={course.courseId} className="border-b hover:bg-gray-50">
                             <td className="p-3">{course.description}</td>
+                            <td className="p-3">{course.duration}</td>
+                            <td className="p-3">
+                                <button
+                                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                                    onClick={() => {
+                                        window.location.href = `/course-details?courseId=${course.courseId}`;
+                                    }}
+                                >
+                                    Xem chi tiết
+                                </button>
+                            </td>
+
+
                             <td className="p-3 space-x-2">
                                 <button className="text-blue-600 hover:underline"
                                     onClick={() => {
