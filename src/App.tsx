@@ -13,6 +13,7 @@ import AvailableCourses from "./components/AvaialableCourses";
 import NoPermissionComponent from "./components/NoPermissionComponent";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CourseDetails from './components/CourseDetails';
+import ClasseDetailsComponent from './components/ClassDetailsComponent';
 
 function App() {
     return <>
@@ -20,7 +21,7 @@ function App() {
             <HeaderComponent />
             <div className="flex h-screen">
                 <Sidebar />
-                <div className="flex-1 bg-gray-200 p-4 overflow-y-auto">
+                <div className="flex-1 bg-gray-200 p-4 overflow-y-hidden">
                     <Routes>
                         // ADMIN ROUTES
                         <Route path="/course" element={
@@ -44,6 +45,12 @@ function App() {
                         <Route path="/classes" element={
                             <ProtectedRoute requireRole={"admin"}>
                                 <ClassesComponent />
+                            </ProtectedRoute>}>
+                        </Route>
+
+                        <Route path="/class-details" element={
+                            <ProtectedRoute requireRole={"admin"}>
+                                <ClasseDetailsComponent />
                             </ProtectedRoute>}>
                         </Route>
                         

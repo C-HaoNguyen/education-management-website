@@ -318,19 +318,28 @@ export default function ClassesComponent() {
                             <td className="border border-gray-400 px-4 py-2">{lop.teacherName}</td>
                             <td className="border border-gray-400 px-4 py-2">{lop.courseName}</td>
                             <td className="border border-gray-400 px-4 py-2">{lop.startDate}</td>
-                            <td className="border border-gray-400 px-4 py-2">
+                            <td className="flex border border-gray-400 px-4 py-2 items-center align-center">
+                                <button
+                                    className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 mr-2"
+                                    onClick={() => {
+                                        window.location.href = `/class-details?classId=${lop.classId}`;
+                                    }}
+                                >
+                                    Xem chi tiết
+                                </button>
+
                                 <button className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2" onClick={() => {
                                     setEditingClass(lop);
                                     setShowEditModal(true);
                                 }}>
-                                    <Edit size={18} />
+                                    <Edit size={20} />
                                 </button>
 
                                 <button className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700" onClick={() => {
                                     setDeletedClass(lop);
                                     setIsShowConfirmDeleteModal(true);
                                 }}>
-                                    <Trash2 size={18} />
+                                    <Trash2 size={20} />
                                 </button>
                             </td>
                         </tr>
