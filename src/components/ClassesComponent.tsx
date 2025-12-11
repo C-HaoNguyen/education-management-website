@@ -18,7 +18,8 @@ export default function ClassesComponent() {
         courseName: "",
         startDate: ""
     }]);
-    const [showAddModal, setShowAddModal] = useState(false);
+    const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+    const [showAddClassModal, setShowAddModal] = useState(false);
     const [newClass, setNewClass] = useState({
         classId: 0,
         className: "",
@@ -28,6 +29,7 @@ export default function ClassesComponent() {
         courseName: "",
         startDate: ""
     });
+    const [newStudentId, setNewStudentId] = useState(0);
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingClass, setEditingClass] = useState<any>(null);
@@ -174,6 +176,26 @@ export default function ClassesComponent() {
         setIsShowErrorMessage(false);
     }
 
+    async function handleAddNewStudentToClass() {
+        const formData = new URLSearchParams();
+        formData.append("classId", editingClass.classId.toString());
+        formData.append("studentId", newStudentId.toString());
+        await fetch('http://localhost:8080/classes/add-student-to-class', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${getAccessToken()}`,
+            },
+            body: formData.toString(),
+        });
+
+        setShowAddStudentModal(false);
+    }
+
+    function handleCancelAddNewStudent() {
+        setShowAddStudentModal(false);
+    }
+
     async function handleUpdateClass() {
         if (!editingClass.className || editingClass.className.trim() === "") {
             setIsShowErrorMessage(true);
@@ -296,11 +318,13 @@ export default function ClassesComponent() {
                     </button>
                 </div>
             </div>
+
             <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={() => {
                 setShowAddModal(true);
             }}>
                 + Add New Class
             </button>
+
             <table className="border-collapse border border-gray-400 w-full">
                 <thead>
                     <tr>
@@ -325,7 +349,17 @@ export default function ClassesComponent() {
                                         window.location.href = `/class-details?classId=${lop.classId}`;
                                     }}
                                 >
-                                    Xem chi tiết
+                                    See details
+                                </button>
+
+                                <button
+                                    className="px-2 py-1 bg-green-600 text-white rounded hover:bg-blue-700 mr-2"
+                                    onClick={() => {
+                                        setEditingClass(lop);
+                                        setShowAddStudentModal(true);
+                                    }}
+                                >
+                                    Add student
                                 </button>
 
                                 <button className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2" onClick={() => {
@@ -347,7 +381,7 @@ export default function ClassesComponent() {
                 </tbody>
             </table>
 
-            {showAddModal ?
+            {showAddClassModal ?
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Add new class</h2>
@@ -381,6 +415,25 @@ export default function ClassesComponent() {
                             </button>
                             <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                                 onClick={handleCancelSaveClass}>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div> : <></>
+            }
+
+            {showAddStudentModal ?
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg w-96 p-6">
+                        <h2 className="text-xl font-bold mb-4">Add new student</h2>
+                        <h4> Student Id </h4> <input className="h-full w-full border border-green-200" onChange={(e) => setNewStudentId(Number(e.target.value))} />
+                        <div className="pt-2">
+                            <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700  mr-2"
+                                onClick={handleAddNewStudentToClass}>
+                                Save
+                            </button>
+                            <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                onClick={handleCancelAddNewStudent}>
                                 Cancel
                             </button>
                         </div>

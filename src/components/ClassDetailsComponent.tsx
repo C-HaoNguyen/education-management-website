@@ -8,6 +8,14 @@ export default function ClassDetailsComponent() {
     const params = new URLSearchParams(location.search);
     const classId = params.get("classId");
 
+    const [classDetail, setClassDetail] = useState({
+        classId: 0,
+        className: "",
+        teacherId: "",
+        courseId: "",
+        startDate: "",
+    });
+
     const [students, setStudents] = useState([{
         studentId: 1,
         studentName: "",
@@ -18,7 +26,34 @@ export default function ClassDetailsComponent() {
 
     useEffect(() => {
         loadListStudentsOfClass();
+        loadClassDetails();
     }, []);
+
+    async function loadClassDetails() {
+        const formData = new URLSearchParams();
+        if (!classId) {
+            alert("No class ID provided");
+            return;
+        }
+        formData.append("classId", classId);
+
+        const response = await fetch(`http://localhost:8080/classes/class-detail`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${getAccessToken()}`
+            },
+            body: formData,
+        });
+        const details = await response.json();
+        setClassDetail({
+            classId: details.classId,
+            className: details.className,
+            teacherId: details.teacherId,
+            courseId: details.courseId,
+            startDate: details.startDate,
+        });
+    }
 
     async function loadListStudentsOfClass() {
         const formData = new URLSearchParams();
@@ -56,37 +91,52 @@ export default function ClassDetailsComponent() {
         setStudents(json);
     }
 
+    function showStudentsTable() {
+        return students.length > 0;
+    }
+
     return (
         <div>
-            <h1>List students of class</h1>
-            <table className="border-collapse border border-gray-400 w-full">
-                <thead>
-                    <tr>
-                        <th className="border border-gray-400 px-4 py-2">Name</th>
-                        <th className="border border-gray-400 px-4 py-2">Email</th>
-                        <th className="border border-gray-400 px-4 py-2">Birthday</th>
-                        <th className="border border-gray-400 px-4 py-2">Phone Number</th>
-                        <th className="border border-gray-400 px-4 py-2">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {students.map((student) => (
-                        <tr>
-                            <td className="border border-gray-400 px-4 py-2">{student.studentName}</td>
-                            <td className="border border-gray-400 px-4 py-2">{student.email}</td>
-                            <td className="border border-gray-400 px-4 py-2">{student.birthday}</td>
-                            <td className="border border-gray-400 px-4 py-2">{student.phoneNumber}</td>
-                            <td className="border border-gray-400 px-4 py-2">
-                                <button className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700" onClick={() => {
-                                    alert(`Delete student with ID: ${student.studentId}`);
-                                }}>
-                                    <Trash2 size={18} />
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <h1>Class Details</h1>
+            <div>
+                <p><strong>Class ID:</strong> {classDetail.classId}</p>
+                <p><strong>Class Name:</strong> {classDetail.className}</p>
+                <p><strong>Start Date:</strong> {classDetail.startDate}</p>
+            </div>
+
+            {showStudentsTable() ?
+                <div>
+                    <h1>List students of class</h1>
+                    <table className="border-collapse border border-gray-400 w-full">
+                        <thead>
+                            <tr>
+                                <th className="border border-gray-400 px-4 py-2">Name</th>
+                                <th className="border border-gray-400 px-4 py-2">Email</th>
+                                <th className="border border-gray-400 px-4 py-2">Birthday</th>
+                                <th className="border border-gray-400 px-4 py-2">Phone Number</th>
+                                <th className="border border-gray-400 px-4 py-2">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {students.map((student) => (
+                                <tr>
+                                    <td className="border border-gray-400 px-4 py-2">{student.studentName}</td>
+                                    <td className="border border-gray-400 px-4 py-2">{student.email}</td>
+                                    <td className="border border-gray-400 px-4 py-2">{student.birthday}</td>
+                                    <td className="border border-gray-400 px-4 py-2">{student.phoneNumber}</td>
+                                    <td className="border border-gray-400 px-4 py-2">
+                                        <button className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700" onClick={() => {
+                                            alert(`Delete student with ID: ${student.studentId}`);
+                                        }}>
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            : <div>No students found for this class.</div>}
         </div>
     );
 

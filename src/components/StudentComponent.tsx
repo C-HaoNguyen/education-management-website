@@ -239,6 +239,7 @@ export default function StudentComponent() {
             <table className="border-collapse border border-gray-400 w-full">
                 <thead>
                     <tr>
+                        <th className="border border-gray-400 px-4 py-2">Student ID</th>
                         <th className="border border-gray-400 px-4 py-2">Name</th>
                         <th className="border border-gray-400 px-4 py-2">Email</th>
                         <th className="border border-gray-400 px-4 py-2">Birthday</th>
@@ -249,6 +250,7 @@ export default function StudentComponent() {
                 <tbody>
                     {students.map((student) => (
                         <tr>
+                            <td className="border border-gray-400 px-4 py-2">{student.studentId}</td>
                             <td className="border border-gray-400 px-4 py-2">{student.studentName}</td>
                             <td className="border border-gray-400 px-4 py-2">{student.email}</td>
                             <td className="border border-gray-400 px-4 py-2">{student.birthday}</td>
