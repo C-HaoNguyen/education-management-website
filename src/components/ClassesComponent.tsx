@@ -30,7 +30,7 @@ export default function ClassesComponent() {
         startDate: ""
     });
     const [newStudentId, setNewStudentId] = useState(0);
-
+    const [isShowErrorMessageStudentId, setIsShowErrorMessageStudentId] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingClass, setEditingClass] = useState<any>(null);
     const [teachers, setTeachers] = useState([{
@@ -177,10 +177,16 @@ export default function ClassesComponent() {
     }
 
     async function handleAddNewStudentToClass() {
+        if (newStudentId <= 0 || isNaN(newStudentId) || !Number.isInteger(newStudentId)) {
+            setIsShowErrorMessageStudentId(true);
+            return;
+        } else {
+            setIsShowErrorMessageStudentId(false);
+        }
         const formData = new URLSearchParams();
         formData.append("classId", editingClass.classId.toString());
         formData.append("studentId", newStudentId.toString());
-        await fetch('http://localhost:8080/classes/add-student-to-class', {
+        const response = await fetch('http://localhost:8080/classes/add-student-to-class', {
             method: 'POST',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -189,11 +195,17 @@ export default function ClassesComponent() {
             body: formData.toString(),
         });
 
-        setShowAddStudentModal(false);
+        if (response.ok) {
+            alert("Thêm học sinh vào lớp thành công!");
+            setShowAddStudentModal(false);
+        } else {
+            alert("Thêm học sinh vào lớp thất bại!");
+        }
     }
 
     function handleCancelAddNewStudent() {
         setShowAddStudentModal(false);
+        setIsShowErrorMessageStudentId(false);
     }
 
     async function handleUpdateClass() {
@@ -426,6 +438,9 @@ export default function ClassesComponent() {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Add new student</h2>
+                        {isShowErrorMessageStudentId && (
+                            <h5 className="text-red-500">Please enter valid student id</h5>
+                        )}
                         <h4> Student Id </h4> <input className="h-full w-full border border-green-200" onChange={(e) => setNewStudentId(Number(e.target.value))} />
                         <div className="pt-2">
                             <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700  mr-2"
