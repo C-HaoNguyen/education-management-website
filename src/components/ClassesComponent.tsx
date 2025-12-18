@@ -16,7 +16,8 @@ export default function ClassesComponent() {
         teacherName: "",
         courseId: "",
         courseName: "",
-        startDate: ""
+        startDate: "",
+        amountOfStudents: 0
     }]);
     const [showAddStudentModal, setShowAddStudentModal] = useState(false);
     const [showAddClassModal, setShowAddModal] = useState(false);
@@ -197,6 +198,10 @@ export default function ClassesComponent() {
 
         if (response.ok) {
             alert("Thêm học sinh vào lớp thành công!");
+            refreshClassList();
+            setShowAddStudentModal(false);
+        } else if (response.status === 409) {
+            alert("Học sinh đã tồn tại trong lớp");
             setShowAddStudentModal(false);
         } else {
             alert("Thêm học sinh vào lớp thất bại!");
@@ -344,6 +349,7 @@ export default function ClassesComponent() {
                         <th className="border border-gray-400 px-4 py-2">Teacher Name</th>
                         <th className="border border-gray-400 px-4 py-2">Course Name</th>
                         <th className="border border-gray-400 px-4 py-2">Start Date</th>
+                        <th className="border border-gray-400 px-4 py-2">Amount of students</th>
                         <th className="border border-gray-400 px-4 py-2">Actions</th>
                     </tr>
                 </thead>
@@ -354,6 +360,7 @@ export default function ClassesComponent() {
                             <td className="border border-gray-400 px-4 py-2">{lop.teacherName}</td>
                             <td className="border border-gray-400 px-4 py-2">{lop.courseName}</td>
                             <td className="border border-gray-400 px-4 py-2">{lop.startDate}</td>
+                            <td className="border border-gray-400 px-4 py-2">{lop.amountOfStudents}</td>
                             <td className="flex border border-gray-400 px-4 py-2 items-center align-center">
                                 <button
                                     className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 mr-2"

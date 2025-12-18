@@ -122,7 +122,10 @@ export default function ClassDetailsComponent() {
             alert("Thêm học sinh vào lớp thành công!");
             setShowAddStudentModal(false);
             loadListStudentsOfClass();
-        } else {
+        } else if (response.status === 409) {
+			alert("Học sinh đã tồn tại trong lớp");
+			setShowAddStudentModal(false);
+		} else {
             alert("Thêm học sinh vào lớp thất bại!");
         }
     }
