@@ -25,7 +25,6 @@ export default function LogInComponent() {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
         console.log("Đăng nhập thành công, token:", data.accessToken);
-        alert("Quyền truy cập: " + getUserRole());
         window.location.href = "/";
     };
 
