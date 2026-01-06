@@ -42,6 +42,7 @@ function App() {
                             </ProtectedRoute>}>
                         </Route>
 
+                        // CLASSES ROUTES
                         <Route path="/classes" element={
                             <ProtectedRoute requireRole={"admin"}>
                                 <ClassesComponent />
