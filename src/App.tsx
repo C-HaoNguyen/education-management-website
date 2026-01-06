@@ -1,5 +1,5 @@
 import './index.css'
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import HeaderComponent from "./components/HeaderComponent";
 import CourseComponent from "./components/CoursesComponent";
@@ -14,6 +14,7 @@ import NoPermissionComponent from "./components/NoPermissionComponent";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CourseDetails from './components/CourseDetails';
 import ClasseDetailsComponent from './components/ClassDetailsComponent';
+import { isLoggedIn } from './utils/AuthUtils';
 
 function App() {
     return <>
@@ -54,8 +55,8 @@ function App() {
                                 <ClasseDetailsComponent />
                             </ProtectedRoute>}>
                         </Route>
-                        
-                        <Route path="/login" element={<LogInComponent />}></Route>
+
+                        <Route path="/login" element={isLoggedIn() ? <Navigate to="/" replace /> : <LogInComponent />}></Route>
                         <Route path="/" element={<WelcomeComponent />}></Route>
                         <Route path="/signup" element={<SignUpComponent />}></Route>
 
