@@ -1,5 +1,6 @@
 import TeacherAvatar from '../assets/TeacherAvatar.jpg';
 import { useState } from 'react';
+import API_URL from '../config/api';
 
 type TeacherCardProps = {
     teacherId: number;
@@ -9,7 +10,7 @@ type TeacherCardProps = {
     onUpdatedTeacher: () => void
 };
 
-export default function TeacherCard({teacherId, name, email, phoneNumber, onUpdatedTeacher}: TeacherCardProps) {
+export default function TeacherCard({ teacherId, name, email, phoneNumber, onUpdatedTeacher }: TeacherCardProps) {
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
@@ -21,7 +22,7 @@ export default function TeacherCard({teacherId, name, email, phoneNumber, onUpda
         //call api to delete this teacher
         const formData = new URLSearchParams();
         formData.append("id", teacherId.toString());
-        const response = fetch('http://localhost:8080/teachers/delete', {
+        const response = fetch(`${API_URL}/teachers/delete`, {
             method: 'DELETE',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -30,31 +31,31 @@ export default function TeacherCard({teacherId, name, email, phoneNumber, onUpda
         });
 
         response.then(() => {
-			setShowConfirmDeleteModal(false);
+            setShowConfirmDeleteModal(false);
             onUpdatedTeacher();
-		})
+        })
     }
 
     function handleEditTeacher() {
-		const formData = new URLSearchParams();
-		formData.append("teacherId", teacherId.toString());
-		formData.append("teacherName", editedTeacherName);
-		formData.append("email", editedTeacherEmail);
-		formData.append("phoneNumber", editedTeacherPhoneNumber);
+        const formData = new URLSearchParams();
+        formData.append("teacherId", teacherId.toString());
+        formData.append("teacherName", editedTeacherName);
+        formData.append("email", editedTeacherEmail);
+        formData.append("phoneNumber", editedTeacherPhoneNumber);
 
-		const response = fetch("http://localhost:8080/teachers/update", {
-			method: "PUT",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-			},
-			body: formData.toString(),
-		});
+        const response = fetch(`${API_URL}/teachers/update`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData.toString(),
+        });
 
-		response.then(() => {
-			setShowEditModal(false);
+        response.then(() => {
+            setShowEditModal(false);
             onUpdatedTeacher();
-		})
-			.catch(error => console.error("Error:", error));
+        })
+            .catch(error => console.error("Error:", error));
     }
 
     return (
