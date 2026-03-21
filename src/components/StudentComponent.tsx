@@ -21,7 +21,8 @@ export default function StudentComponent() {
         studentName: 'Nguyen Van A',
         email: 'a@gmail.com',
         birthday: '2000-01-01',
-        phoneNumber: '0122321421'
+        phoneNumber: '0122321421',
+        isActive: 1
     }]);
 
     useEffect(() => {
@@ -41,7 +42,7 @@ export default function StudentComponent() {
         }
         const data = await response.json();
         const sortedStudents = [...data].sort((a, b) =>
-            a.studentName.localeCompare(b.studentName)
+            a.studentId - b.studentId
         );
         // filter part
         if (filterValue === "") {
@@ -98,6 +99,21 @@ export default function StudentComponent() {
         });
         refreshStudentList();
         setShowEditModal(false);
+    }
+
+    async function handleBlockUnblockStudent(studentId: number) {
+        const formData = new URLSearchParams();
+        formData.append("studentId", studentId.toString());
+
+        await fetch(`${API_URL}/students/update-status`, {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": `Bearer ${getAccessToken()}`
+            },
+            body: formData.toString(),
+        });
+        refreshStudentList();
     }
 
     function handleCancelEditStudent() {
@@ -237,45 +253,53 @@ export default function StudentComponent() {
                 Add Student
             </button>
 
-            <table className="border-collapse border border-gray-400 w-full">
-                <thead>
-                    <tr>
-                        <th className="border border-gray-400 px-4 py-2">Student ID</th>
-                        <th className="border border-gray-400 px-4 py-2">Name</th>
-                        <th className="border border-gray-400 px-4 py-2">Email</th>
-                        <th className="border border-gray-400 px-4 py-2">Birthday</th>
-                        <th className="border border-gray-400 px-4 py-2">Phone Number</th>
-                        <th className="border border-gray-400 px-4 py-2">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {students.map((student) => (
+            <div className="max-h-120 overflow-y-auto">
+                <table className="border-collapse border border-gray-400 w-full">
+                    <thead>
                         <tr>
-                            <td className="border border-gray-400 px-4 py-2">{student.studentId}</td>
-                            <td className="border border-gray-400 px-4 py-2">{student.studentName}</td>
-                            <td className="border border-gray-400 px-4 py-2">{student.email}</td>
-                            <td className="border border-gray-400 px-4 py-2">{student.birthday}</td>
-                            <td className="border border-gray-400 px-4 py-2">{student.phoneNumber}</td>
-                            <td className="border border-gray-400 px-4 py-2">
-                                <button className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2" onClick={() => {
-                                    setEditingStudent(student);
-                                    setShowEditModal(true);
-                                }}>
-                                    <Edit size={18} />
-                                </button>
-
-                                <button className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700" onClick={() => {
-                                    setDeletedStudent(student);
-                                    setShowConfirmDeleteModal(true)
-                                }}>
-                                    <Trash2 size={18} />
-                                </button>
-                            </td>
+                            <th className="border border-gray-400 px-4 py-2">Student ID</th>
+                            <th className="border border-gray-400 px-4 py-2">Name</th>
+                            <th className="border border-gray-400 px-4 py-2">Email</th>
+                            <th className="border border-gray-400 px-4 py-2">Birthday</th>
+                            <th className="border border-gray-400 px-4 py-2">Phone Number</th>
+                            <th className="border border-gray-400 px-4 py-2">Status</th>
+                            <th className="border border-gray-400 px-4 py-2">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {students.map((student) => (
+                            <tr>
+                                <td className="border border-gray-400 px-4 py-2">{student.studentId}</td>
+                                <td className="border border-gray-400 px-4 py-2">{student.studentName}</td>
+                                <td className="border border-gray-400 px-4 py-2">{student.email}</td>
+                                <td className="border border-gray-400 px-4 py-2">{student.birthday}</td>
+                                <td className="border border-gray-400 px-4 py-2">{student.phoneNumber}</td>
+                                <td className="border border-gray-400 px-4 py-2">{student.isActive === 1 ? 'Active' : 'Blocked'}</td>
+                                <td className="border border-gray-400 px-4 py-2">
+                                    <button className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2" onClick={() => {
+                                        setEditingStudent(student);
+                                        setShowEditModal(true);
+                                    }}>
+                                        <Edit size={18} />
+                                    </button>
 
+                                    <button className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700" onClick={() => {
+                                        setDeletedStudent(student);
+                                        setShowConfirmDeleteModal(true)
+                                    }}>
+                                        <Trash2 size={18} />
+                                    </button>
+
+                                    <button className={`ml-2 px-2 py-1 rounded ${student.isActive === 1 ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}
+                                        onClick={() => handleBlockUnblockStudent(student.studentId)}>
+                                        {student.isActive === 1 ? <span>Block</span> : <span>Unblock</span>}
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
