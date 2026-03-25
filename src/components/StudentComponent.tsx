@@ -101,7 +101,7 @@ export default function StudentComponent() {
         formData.append("email", editingStudent.email);
         formData.append("birthday", editingStudent.birthday);
         formData.append("phoneNumber", editingStudent.phoneNumber);
-        await fetch(`${API_URL}/students/update`, {
+        const response = await fetch(`${API_URL}/students/update`, {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -109,6 +109,15 @@ export default function StudentComponent() {
             },
             body: formData.toString(),
         });
+        if (response.status === 400) {
+            const error = await response.text();
+            setInvalidInput(true);
+            setErrorMessage(error);
+            return;
+        } else {
+            setInvalidInput(false);
+            setErrorMessage("");    
+        }
         refreshStudentList();
         setShowEditModal(false);
     }
@@ -214,6 +223,7 @@ export default function StudentComponent() {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Edit Student</h2>
+                        <h5>{invalidInput && <span className="text-red-500">{errorMessage}</span>}</h5>
                         <h4> Student Name </h4> <input className="h-full w-full border border-green-200" value={editingStudent.studentName} onChange={(e) => setEditingStudent({ ...editingStudent, studentName: e.target.value })} />
                         <h4> Email </h4> <input className="h-full w-full border border-green-200" value={editingStudent.email} onChange={(e) => setEditingStudent({ ...editingStudent, email: e.target.value })} />
                         <h4> Birthday </h4> <input type="date" className="h-full w-full border border-green-200" value={editingStudent.birthday} onChange={(e) => setEditingStudent({ ...editingStudent, birthday: e.target.value })} />
