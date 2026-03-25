@@ -15,6 +15,8 @@ export default function StudentComponent() {
     const [deletedStudent, setDeletedStudent] = useState<any>(null);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
     const [filterValue, setFilterValue] = useState("");
+    const [invalidInput, setInvalidInput] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const [students, setStudents] = useState([{
         studentId: 1,
@@ -63,7 +65,7 @@ export default function StudentComponent() {
         formData.append("email", newEmail);
         formData.append("birthday", newBirthday);
         formData.append("phoneNumber", newPhoneNumber);
-        await fetch(`${API_URL}/students/add`, {
+        const response = await fetch(`${API_URL}/students/add`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -71,6 +73,16 @@ export default function StudentComponent() {
             },
             body: formData.toString(),
         });
+
+        if (response.status === 400) {
+            const error = await response.text();
+            setInvalidInput(true);
+            setErrorMessage(error);
+            return;
+        } else {
+            setInvalidInput(false);
+            setErrorMessage("");    
+        }
 
         refreshStudentList();
         resetNewStudent();
@@ -179,6 +191,7 @@ export default function StudentComponent() {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6">
                         <h2 className="text-xl font-bold mb-4">Add New Student</h2>
+                        <h5>{invalidInput && <span className="text-red-500">{errorMessage}</span>}</h5>
                         <h4> Student Name </h4> <input className="h-full w-full border border-green-200" value={newStudentName} onChange={(e) => setNewStudentName(e.target.value)} />
                         <h4> Email </h4> <input className="h-full w-full border border-green-200" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
                         <h4> Birthday </h4> <input type="date" className="h-full w-full border border-green-200" value={newBirthday} onChange={(e) => setNewBirthday(e.target.value)} />
