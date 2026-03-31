@@ -4,16 +4,31 @@ import { getAccessToken } from "../utils/AuthUtils";
 import { Trash2 } from "lucide-react";
 import API_URL from "../config/api";
 
+type ClassDetail = {
+    classId: number;
+    className: string;
+    teacherId: string;
+    courseId: string;
+    startDate: string;
+};
+
+type Student = {
+    studentId: number;
+    studentName: string;
+    email: string;
+    birthday: string;
+    phoneNumber: string;
+};
+
 export default function ClassDetailsComponent() {
     const [showAddStudentModal, setShowAddStudentModal] = useState(false);
     const [newStudentId, setNewStudentId] = useState(0);
     const [isShowErrorMessageStudentId, setIsShowErrorMessageStudentId] = useState(false);
-
     const location = useLocation();
     const params = new URLSearchParams(location.search);
-    const classId = params.get("classId");
+    const classId: number = Number(params.get("classId"));
 
-    const [classDetail, setClassDetail] = useState({
+    const [classDetail, setClassDetail] = useState<ClassDetail>({
         classId: 0,
         className: "",
         teacherId: "",
@@ -21,7 +36,7 @@ export default function ClassDetailsComponent() {
         startDate: "",
     });
 
-    const [students, setStudents] = useState([{
+    const [students, setStudents] = useState<Student[]>([{
         studentId: 1,
         studentName: "",
         email: "",
@@ -40,7 +55,10 @@ export default function ClassDetailsComponent() {
             alert("No class ID provided");
             return;
         }
-        formData.append("classId", classId);
+        // 1.toString() -> "1"
+        // null.toString() -> error
+        // if classId == null -> ko gọi toString() -> ko lỗi
+        formData.append("classId", classId.toString());
 
         const response = await fetch(`${API_URL}/classes/class-detail`, {
             method: "POST",
@@ -67,7 +85,7 @@ export default function ClassDetailsComponent() {
             alert("No class ID provided");
             return;
         }
-        formData.append("classId", classId);
+        formData.append("classId", classId.toString());
 
         const response = await fetch(`${API_URL}/classes/get-list-students-of-class`, {
             method: "POST",
@@ -108,7 +126,7 @@ export default function ClassDetailsComponent() {
             setIsShowErrorMessageStudentId(false);
         }
         const formData = new URLSearchParams();
-        formData.append("classId", classId || "");
+        formData.append("classId", classId.toString());
         formData.append("studentId", newStudentId.toString());
         const response = await fetch(`${API_URL}/classes/add-student-to-class`, {
             method: 'POST',
@@ -138,7 +156,7 @@ export default function ClassDetailsComponent() {
 
     async function handleDeleteStudent(studentId: number) {
         const formData = new URLSearchParams();
-        formData.append("classId", classId || "");
+        formData.append("classId", classId.toString());
         formData.append("studentId", studentId.toString());
         const response = await fetch(`${API_URL}/classes/remove-student-from-class`, {
             method: "DELETE",
@@ -155,6 +173,8 @@ export default function ClassDetailsComponent() {
             alert("Failed to remove student.");
         }
     }
+
+    
 
     return (
         <div>
